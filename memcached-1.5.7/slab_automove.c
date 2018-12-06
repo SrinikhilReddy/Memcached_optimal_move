@@ -115,7 +115,7 @@ void slab_automove_run(void *arg, int *src, int *dst) {
 		youngest = n;
 		youngest_age = a->sam_after[n].total_pages - slab_optimal[n];
 	}
-	if( n<35 && slab_optimal[(int)n%35] !=-1 &&  (int)(a->sam_after[n].total_pages - (int)slab_optimal[(int)n%35]) > oldest_age){
+	if( n<35 && slab_optimal[(int)n%35] !=-1 && a->sam_after[n].total_pages > 1 &&  (int)(a->sam_after[n].total_pages - (int)slab_optimal[(int)n%35]) > oldest_age){
 		oldest = n;
 		oldest_age = a->sam_after[n].total_pages-slab_optimal[n];
 	}
