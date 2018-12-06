@@ -111,7 +111,7 @@ void slab_automove_run(void *arg, int *src, int *dst) {
 	
 	if( n <35 && slab_optimal[(int)n%35] !=-1 && a->iam_after[n].evicted > 0  &&  (int)(a->sam_after[n].total_pages - (int)slab_optimal[(int)n%35]) < youngest_age){
 	//	printf("comes here \n");
-		printf("youngest: %d,%d",n,slab_optimal[(int)n%35]);
+//		printf("youngest: %d,%d",n,slab_optimal[(int)n%35]);
 		youngest = n;
 		youngest_age = a->sam_after[n].total_pages - slab_optimal[n];
 	}

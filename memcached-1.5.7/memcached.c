@@ -3409,6 +3409,7 @@ static void process_slab_optimal(conn *c, token_t *tokens, const size_t ntokens)
 		
                 safe_strtoul(tokens[i+1].value, &slab_optimal[i]);
         }
+	 out_string(c, "OKAY");
         /*      
                 Release signal
         */
