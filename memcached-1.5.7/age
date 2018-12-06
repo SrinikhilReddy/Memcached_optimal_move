@@ -1,0 +1,3140 @@
+assoc.c:/* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
+assoc.c:typedef  unsigned long  int  ub4;   /* unsigned 4-byte quantities */
+assoc.c:typedef  unsigned       char ub1;   /* unsigned 1-byte quantities */
+assoc.c:#define hashmask(n) (hashsize(n)-1)
+assoc.c: * far we've gotten so far. Ranges from 0 .. hashsize(hashpower - 1) - 1.
+assoc.c:        (oldbucket = (hv & hashmask(hashpower - 1))) >= expand_bucket)
+assoc.c:        if ((nkey == it->nkey) && (memcmp(key, ITEM_key(it), nkey) == 0)) {
+assoc.c:        it = it->h_next;
+assoc.c:        (oldbucket = (hv & hashmask(hashpower - 1))) >= expand_bucket)
+assoc.c:    while (*pos && ((nkey != (*pos)->nkey) || memcmp(key, ITEM_key(*pos), nkey))) {
+assoc.c:        pos = &(*pos)->h_next;
+assoc.c://    assert(assoc_find(ITEM_key(it), it->nkey) == 0);  /* shouldn't have duplicately named things defined */
+assoc.c:        (oldbucket = (hv & hashmask(hashpower - 1))) >= expand_bucket)
+assoc.c:        it->h_next = old_hashtable[oldbucket];
+assoc.c:        it->h_next = primary_hashtable[hv & hashmask(hashpower)];
+assoc.c:    MEMCACHED_ASSOC_INSERT(ITEM_key(it), it->nkey);
+assoc.c:         * due to possible tail-optimization by the compiler
+assoc.c:        nxt = (*before)->h_next;
+assoc.c:        (*before)->h_next = 0;   /* probably pointless, but whatever. */
+assoc.c:                        next = it->h_next;
+assoc.c:                        bucket = hash(ITEM_key(it), it->nkey) & hashmask(hashpower);
+assoc.c:                        it->h_next = primary_hashtable[bucket];
+assoc.c:                    if (expand_bucket == hashsize(hashpower - 1)) {
+assoc.c:                        stats_state.hash_bytes -= hashsize(hashpower - 1) * sizeof(void *);
+assoc.c:        return -1;
+bipbuffer.c: * Copyright (c) 2011, Willem-Hendrik Thiart
+bipbuffer.c: * Use of this source code is governed by a BSD-style license that can be
+bipbuffer.c:    if (1 == me->b_inuse)
+bipbuffer.c:        return me->a_start - me->b_end;
+bipbuffer.c:        return me->size - me->a_end;
+bipbuffer.c:    return me->size;
+bipbuffer.c:    return (me->a_end - me->a_start) + me->b_end;
+bipbuffer.c:    me->a_start = me->a_end = me->b_end = 0;
+bipbuffer.c:    me->size = size;
+bipbuffer.c:    me->b_inuse = 0;
+bipbuffer.c:    return me->a_start == me->a_end;
+bipbuffer.c:    if (me->size - me->a_end < me->a_start - me->b_end)
+bipbuffer.c:        me->b_inuse = 1;
+bipbuffer.c:    if (1 == me->b_inuse)
+bipbuffer.c:        return (unsigned char *)me->data + me->b_end;
+bipbuffer.c:        return (unsigned char *)me->data + me->a_end;
+bipbuffer.c:    if (1 == me->b_inuse)
+bipbuffer.c:        me->b_end += size;
+bipbuffer.c:        me->a_end += size;
+bipbuffer.c:    if (1 == me->b_inuse)
+bipbuffer.c:        memcpy(me->data + me->b_end, data, size);
+bipbuffer.c:        me->b_end += size;
+bipbuffer.c:        memcpy(me->data + me->a_end, data, size);
+bipbuffer.c:        me->a_end += size;
+bipbuffer.c:    if (me->size < me->a_start + size)
+bipbuffer.c:    return (unsigned char *)me->data + me->a_start;
+bipbuffer.c:    *size = me->a_end - me->a_start;
+bipbuffer.c:    return (unsigned char*)me->data + me->a_start;
+bipbuffer.c:    if (me->size < me->a_start + size)
+bipbuffer.c:    void *end = me->data + me->a_start;
+bipbuffer.c:    me->a_start += size;
+bipbuffer.c:    if (me->a_start == me->a_end)
+bipbuffer.c:        if (1 == me->b_inuse)
+bipbuffer.c:            me->a_start = 0;
+bipbuffer.c:            me->a_end = me->b_end;
+bipbuffer.c:            me->b_end = me->b_inuse = 0;
+bipbuffer.c:            me->a_start = me->a_end = 0;
+cache.c:/* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
+cache.c:        pthread_mutex_init(&ret->mutex, NULL) == -1) {
+cache.c:    ret->name = nm;
+cache.c:    ret->ptr = ptr;
+cache.c:    ret->freetotal = initial_pool_size;
+cache.c:    ret->constructor = constructor;
+cache.c:    ret->destructor = destructor;
+cache.c:    ret->bufsize = bufsize + 2 * sizeof(redzone_pattern);
+cache.c:    ret->bufsize = bufsize;
+cache.c:    while (cache->freecurr > 0) {
+cache.c:        void *ptr = cache->ptr[--cache->freecurr];
+cache.c:        if (cache->destructor) {
+cache.c:            cache->destructor(get_object(ptr), NULL);
+cache.c:    free(cache->name);
+cache.c:    free(cache->ptr);
+cache.c:    pthread_mutex_destroy(&cache->mutex);
+cache.c:    pthread_mutex_lock(&cache->mutex);
+cache.c:    pthread_mutex_unlock(&cache->mutex);
+cache.c:    if (cache->freecurr > 0) {
+cache.c:        ret = cache->ptr[--cache->freecurr];
+cache.c:        object = ret = malloc(cache->bufsize);
+cache.c:            if (cache->constructor != NULL &&
+cache.c:                cache->constructor(object, NULL, 0) != 0) {
+cache.c:        /* add a simple form of buffer-check */
+cache.c:        memcpy(((char*)ret) + cache->bufsize - (2 * sizeof(redzone_pattern)),
+cache.c:    pthread_mutex_lock(&cache->mutex);
+cache.c:    pthread_mutex_unlock(&cache->mutex);
+cache.c:    if (memcmp(((char*)ptr) + cache->bufsize - (2 * sizeof(redzone_pattern)),
+cache.c:    --pre;
+cache.c:        cache_error = -1;
+cache.c:    if (cache->freecurr < cache->freetotal) {
+cache.c:        cache->ptr[cache->freecurr++] = ptr;
+cache.c:        size_t newtotal = cache->freetotal * 2;
+cache.c:        void **new_free = realloc(cache->ptr, sizeof(char *) * newtotal);
+cache.c:            cache->freetotal = newtotal;
+cache.c:            cache->ptr = new_free;
+cache.c:            cache->ptr[cache->freecurr++] = ptr;
+cache.c:            if (cache->destructor) {
+cache.c:                cache->destructor(ptr, NULL);
+crawler.c:/* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
+crawler.c:    crawler_doneclass_func doneclass; /* runs once per sub-crawler completion. */
+crawler.c:    crawler_finalize_func finalize; /* runs once when all sub-crawlers are done. */
+crawler.c:    sidethread_conn_close(c->c);
+crawler.c:    c->c = NULL;
+crawler.c:    c->cbuf = NULL;
+crawler.c:    bipbuf_free(c->buf);
+crawler.c:    c->buf = NULL;
+crawler.c:    redispatch_conn(c->c);
+crawler.c:    c->c = NULL;
+crawler.c:    c->cbuf = NULL;
+crawler.c:    bipbuf_free(c->buf);
+crawler.c:    c->buf = NULL;
+crawler.c:        d->is_external = true;
+crawler.c:        cm->data = data;
+crawler.c:            return -1;
+crawler.c:        pthread_mutex_init(&d->lock, NULL);
+crawler.c:        d->is_external = false;
+crawler.c:        d->start_time = current_time;
+crawler.c:        cm->data = d;
+crawler.c:    pthread_mutex_lock(&d->lock);
+crawler.c:    memset(&d->crawlerstats, 0, sizeof(crawlerstats_t) * POWER_LARGEST);
+crawler.c:        d->crawlerstats[x].start_time = current_time;
+crawler.c:        d->crawlerstats[x].run_complete = false;
+crawler.c:    pthread_mutex_unlock(&d->lock);
+crawler.c:    struct crawler_expired_data *d = (struct crawler_expired_data *) cm->data;
+crawler.c:    pthread_mutex_lock(&d->lock);
+crawler.c:    d->crawlerstats[slab_cls].end_time = current_time;
+crawler.c:    d->crawlerstats[slab_cls].run_complete = true;
+crawler.c:    pthread_mutex_unlock(&d->lock);
+crawler.c:    struct crawler_expired_data *d = (struct crawler_expired_data *) cm->data;
+crawler.c:    pthread_mutex_lock(&d->lock);
+crawler.c:    d->end_time = current_time;
+crawler.c:    d->crawl_complete = true;
+crawler.c:    pthread_mutex_unlock(&d->lock);
+crawler.c:    if (!d->is_external) {
+crawler.c:    struct crawler_expired_data *d = (struct crawler_expired_data *) cm->data;
+crawler.c:    pthread_mutex_lock(&d->lock);
+crawler.c:    crawlerstats_t *s = &d->crawlerstats[i];
+crawler.c:    if (search->it_flags & ITEM_HDR) {
+crawler.c:        if (extstore_check(storage, hdr->page_id, hdr->page_version) != 0)
+crawler.c:    if ((search->exptime != 0 && search->exptime < current_time)
+crawler.c:        s->reclaimed++;
+crawler.c:                search->it_flags, search->slabs_clsid);
+crawler.c:            for (ii = 0; ii < search->nkey; ++ii) {
+crawler.c:        if ((search->it_flags & ITEM_FETCHED) == 0 && !is_flushed) {
+crawler.c:        assert(search->slabs_clsid == 0);
+crawler.c:        s->seen++;
+crawler.c:        if (search->exptime == 0) {
+crawler.c:            s->noexp++;
+crawler.c:        } else if (search->exptime - current_time > 3599) {
+crawler.c:            s->ttl_hourplus++;
+crawler.c:            rel_time_t ttl_remain = search->exptime - current_time;
+crawler.c:                s->histo[bucket]++;
+crawler.c:    pthread_mutex_unlock(&d->lock);
+crawler.c:    if ((it->exptime != 0 && it->exptime < current_time)
+crawler.c:    uriencode(ITEM_key(it), keybuf, it->nkey, KEY_MAX_LENGTH * 3 + 1);
+crawler.c:    int total = snprintf(cm->c.cbuf, 4096,
+crawler.c:            (it->exptime == 0) ? -1 : (long)(it->exptime + process_started),
+crawler.c:            (unsigned long long)(it->time + process_started),
+crawler.c:            (it->it_flags & ITEM_FETCHED) ? "yes" : "no",
+crawler.c:    if (total >= LRU_CRAWLER_WRITEBUF - 1 || total <= 0) {
+crawler.c:    bipbuf_push(cm->c.buf, total);
+crawler.c:    if (cm->c.c != NULL) {
+crawler.c:        lru_crawler_client_getbuf(&cm->c);
+crawler.c:        memcpy(cm->c.cbuf, "END\r\n", 5);
+crawler.c:        bipbuf_push(cm->c.buf, 5);
+crawler.c:    to_poll[0].fd = c->sfd;
+crawler.c:        return -1;
+crawler.c:        int res = read(c->sfd, buf, 1);
+crawler.c:        if (res == 0 || (res == -1 && (errno != EAGAIN && errno != EWOULDBLOCK))) {
+crawler.c:            return -1;
+crawler.c:    if ((data = bipbuf_peek_all(c->buf, &data_size)) != NULL) {
+crawler.c:            return -1;
+crawler.c:            int total = write(c->sfd, data, data_size);
+crawler.c:            if (total == -1) {
+crawler.c:                    return -1;
+crawler.c:                return -1;
+crawler.c:                bipbuf_poll(c->buf, total);
+crawler.c:    if (c->c == NULL) return -1;
+crawler.c:    while ((buf = bipbuf_request(c->buf, LRU_CRAWLER_WRITEBUF)) == NULL) {
+crawler.c:    c->cbuf = buf;
+crawler.c:    crawler_count--;
+crawler.c:    if (active_crawler_mod.mod->doneclass != NULL)
+crawler.c:        active_crawler_mod.mod->doneclass(&active_crawler_mod, i);
+crawler.c:            } else if (active_crawler_mod.mod->needs_client) {
+crawler.c:                (crawlers[i].remaining && --crawlers[i].remaining < 1)) {
+crawler.c:            uint32_t hv = hash(ITEM_key(search), search->nkey);
+crawler.c:            if (!active_crawler_mod.mod->needs_lock) {
+crawler.c:            active_crawler_mod.mod->eval(&active_crawler_mod, search, hv, i);
+crawler.c:            if (active_crawler_mod.mod->needs_lock) {
+crawler.c:            if (crawls_persleep-- <= 0 && settings.lru_crawler_sleep) {
+crawler.c:        if (active_crawler_mod.mod->finalize != NULL)
+crawler.c:            active_crawler_mod.mod->finalize(&active_crawler_mod);
+crawler.c:        return -1;
+crawler.c:        return -1;
+crawler.c:        return -1;
+crawler.c:         * - scan all elements, until a NULL is reached
+crawler.c:         * - if empty, NULL is reached right away
+crawler.c:         * - first n elements are parsed (or until a NULL is reached)
+crawler.c:    crawler_client_t *crawlc = &cm->c;
+crawler.c:    if (crawlc->c != NULL) {
+crawler.c:        return -1;
+crawler.c:    crawlc->c = c;
+crawler.c:    crawlc->sfd = sfd;
+crawler.c:    crawlc->buf = bipbuf_new(1024 * 128);
+crawler.c:    if (crawlc->buf == NULL) {
+crawler.c:        return -2;
+crawler.c:        return -1;
+crawler.c:        return -1;
+crawler.c:        if (active_crawler_mod.mod->init != NULL) {
+crawler.c:            active_crawler_mod.mod->init(&active_crawler_mod, data);
+crawler.c:        if (active_crawler_mod.mod->needs_client) {
+crawler.c:                return -2;
+crawler.c:                return -2;
+crawler.c:    /* we allow the autocrawler to restart sub-LRU's before completion */
+crawler.c:    if (starts == -1) {
+crawler.c:    } else if (starts == -2) {
+crawler.c:            return -1;
+crc32c.c:/* crc32c.c -- compute CRC-32C using the Intel crc32 instruction
+crc32c.c:  This software is provided 'as-is', without any express or implied
+crc32c.c:   CRC-32C, *not* the CRC-32 used by Ethernet and zip, gzip, etc.  A software
+crc32c.c:   version is provided as a fall-back, as well as for speed comparisons. */
+crc32c.c:/* CRC-32C (iSCSI) polynomial in reversed bit order. */
+crc32c.c:/* Table for a quadword-at-a-time software crc. */
+crc32c.c:/* Construct table for software CRC-32C calculation. */
+crc32c.c:/* Table-driven software version as a fall-back.  This is about 15 times slower
+crc32c.c:   than using the hardware instructions.  This assumes little-endian integers,
+crc32c.c:        len--;
+crc32c.c:        len -= 8;
+crc32c.c:        len--;
+crc32c.c:    uint32_t odd[32];       /* odd-power-of-two zeros operator */
+crc32c.c:    odd[0] = POLY;              /* CRC-32C polynomial */
+crc32c.c:       in even -- next square puts operator for two zero bytes in odd, and so
+crc32c.c:    /* answer ended up in odd -- copy to even */
+crc32c.c:   for that length, byte-by-byte on the operand. */
+crc32c.c:/* Block sizes for three-way parallel crc computation.  LONG and SHORT must
+crc32c.c:/* Compute CRC-32C using the Intel hardware instruction. */
+crc32c.c:    /* pre-process the crc */
+crc32c.c:       to an eight-byte boundary */
+crc32c.c:        len--;
+crc32c.c:       instructions, each on LONG bytes -- this is optimized for the Nehalem,
+crc32c.c:        len -= LONG*3;
+crc32c.c:        len -= SHORT*3;
+crc32c.c:    /* compute the crc on the remaining eight-byte units less than a SHORT*3
+crc32c.c:    end = next + (len - (len & 7));
+crc32c.c:        len--;
+crc32c.c:    /* return a post-processed crc */
+crc32c.c:/* Compute a CRC-32C.  If the crc32 instruction is available, use the hardware
+daemon.c:/*-
+daemon.c:    case -1:
+daemon.c:        return (-1);
+daemon.c:    if (setsid() == -1)
+daemon.c:        return (-1);
+daemon.c:            return (-1);
+daemon.c:    if (noclose == 0 && (fd = open("/dev/null", O_RDWR, 0)) != -1) {
+daemon.c:            return (-1);
+daemon.c:            return (-1);
+daemon.c:            return (-1);
+daemon.c:                return (-1);
+extstore.c:/* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
+extstore.c:#define STAT_L(e) pthread_mutex_lock(&e->stats_mutex);
+extstore.c:#define STAT_UL(e) pthread_mutex_unlock(&e->stats_mutex);
+extstore.c:    pthread_mutex_lock(&e->stats_mutex); \
+extstore.c:    e->stats.stat += amount; \
+extstore.c:    pthread_mutex_unlock(&e->stats_mutex); \
+extstore.c:    pthread_mutex_lock(&e->stats_mutex); \
+extstore.c:    e->stats.stat -= amount; \
+extstore.c:    pthread_mutex_unlock(&e->stats_mutex); \
+extstore.c:    uint64_t obj_count; /* _delete can decrease post-closing */
+extstore.c:    uint64_t bytes_used; /* _delete can decrease post-closing */
+extstore.c:    b->buf = malloc(size);
+extstore.c:    if (b->buf == NULL) {
+extstore.c:    b->buf_pos = b->buf;
+extstore.c:    b->free = size;
+extstore.c:    b->size = size;
+extstore.c:    pthread_mutex_lock(&e->mutex);
+extstore.c:    tid = (e->last_io_thread + 1) % e->io_threadcount;
+extstore.c:    e->last_io_thread = tid;
+extstore.c:    pthread_mutex_unlock(&e->mutex);
+extstore.c:    return &e->io_threads[tid];
+extstore.c:    return e->version++;
+extstore.c:    memcpy(st, &e->stats, sizeof(struct extstore_stats));
+extstore.c:    pthread_mutex_lock(&e->mutex);
+extstore.c:    st->pages_free = e->page_free;
+extstore.c:    st->pages_used = e->page_count - e->page_free;
+extstore.c:    pthread_mutex_unlock(&e->mutex);
+extstore.c:    // note that open and yet-filled pages count against fragmentation.
+extstore.c:    st->bytes_fragmented = st->pages_used * e->page_size -
+extstore.c:        st->bytes_used;
+extstore.c:    memcpy(st->page_data, e->stats.page_data,
+extstore.c:            sizeof(struct extstore_page_data) * e->page_count);
+extstore.c:    if (cf->page_size % cf->wbuf_size != 0) {
+extstore.c:    if (cf->page_buckets > cf->wbuf_count) {
+extstore.c:    if (cf->page_buckets < 1) {
+extstore.c:    if (cf->page_size % (1024 * 1024 * 2) != 0 ||
+extstore.c:        cf->wbuf_size % (1024 * 1024 * 2) != 0) {
+extstore.c:    e->page_size = cf->page_size;
+extstore.c:    e->pages = calloc(cf->page_count, sizeof(store_page));
+extstore.c:    if (e->pages == NULL) {
+extstore.c:    for (i = 0; i < cf->page_count; i++) {
+extstore.c:        pthread_mutex_init(&e->pages[i].mutex, NULL);
+extstore.c:        e->pages[i].id = i;
+extstore.c:        e->pages[i].fd = fd;
+extstore.c:        e->pages[i].offset = offset;
+extstore.c:        e->pages[i].free = true;
+extstore.c:        offset += e->page_size;
+extstore.c:    for (i = cf->page_count-1; i > 0; i--) {
+extstore.c:        e->pages[i].next = e->page_freelist;
+extstore.c:        e->page_freelist = &e->pages[i];
+extstore.c:        e->page_free++;
+extstore.c:    e->version = 1;
+extstore.c:    e->page_count = cf->page_count;
+extstore.c:    e->stats.page_data =
+extstore.c:        calloc(e->page_count, sizeof(struct extstore_page_data));
+extstore.c:    e->stats.page_count = e->page_count;
+extstore.c:    e->stats.page_size = e->page_size;
+extstore.c:    e->page_buckets = calloc(cf->page_buckets, sizeof(store_page *));
+extstore.c:    e->page_bucketcount = cf->page_buckets;
+extstore.c:    for (i = 0; i < cf->wbuf_count; i++) {
+extstore.c:        _store_wbuf *w = wbuf_new(cf->wbuf_size);
+extstore.c:        w->next = e->wbuf_stack;
+extstore.c:        e->wbuf_stack = w;
+extstore.c:        io->next = e->io_stack;
+extstore.c:        e->io_stack = io;
+extstore.c:    pthread_mutex_init(&e->mutex, NULL);
+extstore.c:    pthread_mutex_init(&e->stats_mutex, NULL);
+extstore.c:    e->io_depth = cf->io_depth;
+extstore.c:    e->io_threads = calloc(cf->io_threadcount, sizeof(store_io_thread));
+extstore.c:    for (i = 0; i < cf->io_threadcount; i++) {
+extstore.c:        pthread_mutex_init(&e->io_threads[i].mutex, NULL);
+extstore.c:        pthread_cond_init(&e->io_threads[i].cond, NULL);
+extstore.c:        e->io_threads[i].e = e;
+extstore.c:        pthread_create(&thread, NULL, extstore_io_thread, &e->io_threads[i]);
+extstore.c:    e->io_threadcount = cf->io_threadcount;
+extstore.c:    e->maint_thread = calloc(1, sizeof(store_maint_thread));
+extstore.c:    e->maint_thread->e = e;
+extstore.c:    pthread_mutex_init(&e->maint_thread->mutex, NULL);
+extstore.c:    pthread_cond_init(&e->maint_thread->cond, NULL);
+extstore.c:    pthread_create(&thread, NULL, extstore_maint_thread, e->maint_thread);
+extstore.c:    pthread_cond_signal(&e->maint_thread->cond);
+extstore.c:    assert(!e->page_buckets[bucket] || e->page_buckets[bucket]->allocated == e->page_size);
+extstore.c:    store_page *tmp = e->page_freelist;
+extstore.c:    if (e->page_free > 0) {
+extstore.c:        assert(e->page_freelist != NULL);
+extstore.c:        e->page_freelist = tmp->next;
+extstore.c:        tmp->next = e->page_buckets[bucket];
+extstore.c:        e->page_buckets[bucket] = tmp;
+extstore.c:        tmp->active = true;
+extstore.c:        tmp->free = false;
+extstore.c:        tmp->closed = false;
+extstore.c:        tmp->version = _next_version(e);
+extstore.c:        tmp->bucket = bucket;
+extstore.c:        e->page_free--;
+extstore.c:        E_DEBUG("EXTSTORE: got page %u\n", tmp->id);
+extstore.c:    assert(!p->wbuf);
+extstore.c:    pthread_mutex_lock(&e->mutex);
+extstore.c:    if (e->wbuf_stack) {
+extstore.c:        wbuf = e->wbuf_stack;
+extstore.c:        e->wbuf_stack = wbuf->next;
+extstore.c:        wbuf->next = 0;
+extstore.c:    pthread_mutex_unlock(&e->mutex);
+extstore.c:        wbuf->offset = p->allocated;
+extstore.c:        p->allocated += wbuf->size;
+extstore.c:        wbuf->free = wbuf->size;
+extstore.c:        wbuf->buf_pos = wbuf->buf;
+extstore.c:        wbuf->full = false;
+extstore.c:        wbuf->flushed = false;
+extstore.c:        p->wbuf = wbuf;
+extstore.c:    store_page *p = &e->pages[io->page_id];
+extstore.c:    _store_wbuf *w = (_store_wbuf *) io->data;
+extstore.c:    // Naive first-pass should probably cause the page to close/free.
+extstore.c:    w->flushed = true;
+extstore.c:    pthread_mutex_lock(&p->mutex);
+extstore.c:    assert(p->wbuf != NULL && p->wbuf == w);
+extstore.c:    assert(p->written == w->offset);
+extstore.c:    p->written += w->size;
+extstore.c:    p->wbuf = NULL;
+extstore.c:    if (p->written == e->page_size)
+extstore.c:        p->active = false;
+extstore.c:    pthread_mutex_lock(&e->mutex);
+extstore.c:    w->next = e->wbuf_stack;
+extstore.c:    e->wbuf_stack = w;
+extstore.c:    io->next = e->io_stack;
+extstore.c:    e->io_stack = io;
+extstore.c:    pthread_mutex_unlock(&e->mutex);
+extstore.c:    pthread_mutex_unlock(&p->mutex);
+extstore.c:    pthread_mutex_lock(&e->mutex);
+extstore.c:    obj_io *io = e->io_stack;
+extstore.c:    e->io_stack = io->next;
+extstore.c:    pthread_mutex_unlock(&e->mutex);
+extstore.c:    w = p->wbuf;
+extstore.c:    memset(w->buf + (w->size - w->free), 0, w->free);
+extstore.c:    io->next = NULL;
+extstore.c:    io->mode = OBJ_IO_WRITE;
+extstore.c:    io->page_id = p->id;
+extstore.c:    io->data = w;
+extstore.c:    io->offset = w->offset;
+extstore.c:    io->len = w->size;
+extstore.c:    io->buf = w->buf;
+extstore.c:    io->cb = _wbuf_cb;
+extstore.c:    int ret = -1;
+extstore.c:    if (bucket >= e->page_bucketcount)
+extstore.c:    pthread_mutex_lock(&e->mutex);
+extstore.c:    p = e->page_buckets[bucket];
+extstore.c:    pthread_mutex_unlock(&e->mutex);
+extstore.c:    pthread_mutex_lock(&p->mutex);
+extstore.c:    if (!p->active ||
+extstore.c:            ((!p->wbuf || p->wbuf->full) && p->allocated >= e->page_size)) {
+extstore.c:        pthread_mutex_unlock(&p->mutex);
+extstore.c:        pthread_mutex_lock(&e->mutex);
+extstore.c:        pthread_mutex_unlock(&e->mutex);
+extstore.c:    if (p->wbuf && p->wbuf->free < io->len && !p->wbuf->full) {
+extstore.c:        p->wbuf->full = true;
+extstore.c:    if (!p->wbuf && p->allocated < e->page_size) {
+extstore.c:    if (p->wbuf && !p->wbuf->full && p->wbuf->free >= io->len) {
+extstore.c:        io->buf = p->wbuf->buf_pos;
+extstore.c:        io->page_id = p->id;
+extstore.c:    pthread_mutex_unlock(&p->mutex);
+extstore.c:    // p->written is incremented post-wbuf flush
+extstore.c:    store_page *p = &e->pages[io->page_id];
+extstore.c:    io->offset = p->wbuf->offset + (p->wbuf->size - p->wbuf->free);
+extstore.c:    io->page_version = p->version;
+extstore.c:    p->wbuf->buf_pos += io->len;
+extstore.c:    p->wbuf->free -= io->len;
+extstore.c:    p->bytes_used += io->len;
+extstore.c:    p->obj_count++;
+extstore.c:    e->stats.bytes_written += io->len;
+extstore.c:    e->stats.bytes_used += io->len;
+extstore.c:    e->stats.objects_written++;
+extstore.c:    e->stats.objects_used++;
+extstore.c:    pthread_mutex_unlock(&p->mutex);
+extstore.c:    pthread_mutex_lock(&t->mutex);
+extstore.c:    if (t->queue == NULL) {
+extstore.c:        t->queue = io;
+extstore.c:        obj_io *tmp = t->queue;
+extstore.c:        while (tmp->next != NULL) {
+extstore.c:            tmp = tmp->next;
+extstore.c:            assert(tmp != t->queue);
+extstore.c:        tmp->next = io;
+extstore.c:    pthread_mutex_unlock(&t->mutex);
+extstore.c:    //pthread_mutex_lock(&t->mutex);
+extstore.c:    pthread_cond_signal(&t->cond);
+extstore.c:    //pthread_mutex_unlock(&t->mutex);
+extstore.c:    store_page *p = &e->pages[page_id];
+extstore.c:    pthread_mutex_lock(&p->mutex);
+extstore.c:    if (!p->closed && p->version == page_version) {
+extstore.c:        if (p->bytes_used >= bytes) {
+extstore.c:            p->bytes_used -= bytes;
+extstore.c:            p->bytes_used = 0;
+extstore.c:        if (p->obj_count >= count) {
+extstore.c:            p->obj_count -= count;
+extstore.c:            p->obj_count = 0; // caller has bad accounting?
+extstore.c:        e->stats.bytes_used -= bytes;
+extstore.c:        e->stats.objects_used -= count;
+extstore.c:        if (p->obj_count == 0) {
+extstore.c:        ret = -1;
+extstore.c:    pthread_mutex_unlock(&p->mutex);
+extstore.c:    store_page *p = &e->pages[page_id];
+extstore.c:    pthread_mutex_lock(&p->mutex);
+extstore.c:    if (p->version != page_version)
+extstore.c:        ret = -1;
+extstore.c:    pthread_mutex_unlock(&p->mutex);
+extstore.c:    store_page *p = &e->pages[page_id];
+extstore.c:    pthread_mutex_lock(&p->mutex);
+extstore.c:    if (!p->closed && p->version == page_version) {
+extstore.c:        p->closed = true;
+extstore.c:    pthread_mutex_unlock(&p->mutex);
+extstore.c:    _store_wbuf *wbuf = p->wbuf;
+extstore.c:    assert(io->offset < p->written + wbuf->size);
+extstore.c:    if (io->iov == NULL) {
+extstore.c:        memcpy(io->buf, wbuf->buf + (io->offset - wbuf->offset), io->len);
+extstore.c:        unsigned int off = io->offset - wbuf->offset;
+extstore.c:        for (x = 0; x < io->iovcnt; x++) {
+extstore.c:            struct iovec *iov = &io->iov[x];
+extstore.c:            memcpy(iov->iov_base, wbuf->buf + off, iov->iov_len);
+extstore.c:            off += iov->iov_len;
+extstore.c:    return io->len;
+extstore.c:    store_engine *e = me->e;
+extstore.c:        pthread_mutex_lock(&me->mutex);
+extstore.c:        if (me->queue == NULL) {
+extstore.c:            pthread_cond_wait(&me->cond, &me->mutex);
+extstore.c:        if (me->queue != NULL) {
+extstore.c:            io_stack = me->queue;
+extstore.c:            for (i = 1; i < e->io_depth; i++) {
+extstore.c:                if (end->next) {
+extstore.c:                    end = end->next;
+extstore.c:            me->queue = end->next;
+extstore.c:            end->next = NULL;
+extstore.c:        pthread_mutex_unlock(&me->mutex);
+extstore.c:            obj_io *next = cur_io->next;
+extstore.c:            store_page *p = &e->pages[cur_io->page_id];
+extstore.c:            switch (cur_io->mode) {
+extstore.c:                    pthread_mutex_lock(&p->mutex);
+extstore.c:                    if (!p->free && !p->closed && p->version == cur_io->page_version) {
+extstore.c:                        if (p->active && cur_io->offset >= p->written) {
+extstore.c:                            p->refcount++;
+extstore.c:                        e->stats.bytes_read += cur_io->len;
+extstore.c:                        e->stats.objects_read++;
+extstore.c:                        ret = -2; // TODO: enum in IO for status?
+extstore.c:                    pthread_mutex_unlock(&p->mutex);
+extstore.c:                        if (cur_io->iov == NULL) {
+extstore.c:                            ret = pread(p->fd, cur_io->buf, cur_io->len, p->offset + cur_io->offset);
+extstore.c:                            ret = preadv(p->fd, cur_io->iov, cur_io->iovcnt, p->offset + cur_io->offset);
+extstore.c:                    ret = pwrite(p->fd, cur_io->buf, cur_io->len, p->offset + cur_io->offset);
+extstore.c:            if (ret == -1) {
+extstore.c:            cur_io->cb(e, cur_io, ret);
+extstore.c:                pthread_mutex_lock(&p->mutex);
+extstore.c:                p->refcount--;
+extstore.c:                pthread_mutex_unlock(&p->mutex);
+extstore.c:    E_DEBUG("EXTSTORE: freeing page %u\n", p->id);
+extstore.c:    e->stats.objects_used -= p->obj_count;
+extstore.c:    e->stats.bytes_used -= p->bytes_used;
+extstore.c:    e->stats.page_reclaims++;
+extstore.c:    pthread_mutex_lock(&e->mutex);
+extstore.c:    tmp = e->page_buckets[p->bucket];
+extstore.c:                prev->next = tmp->next;
+extstore.c:                e->page_buckets[p->bucket] = tmp->next;
+extstore.c:            tmp->next = NULL;
+extstore.c:        tmp = tmp->next;
+extstore.c:    p->version = 0;
+extstore.c:    p->obj_count = 0;
+extstore.c:    p->bytes_used = 0;
+extstore.c:    p->allocated = 0;
+extstore.c:    p->written = 0;
+extstore.c:    p->bucket = 0;
+extstore.c:    p->active = false;
+extstore.c:    p->closed = false;
+extstore.c:    p->free = true;
+extstore.c:    p->next = e->page_freelist;
+extstore.c:    e->page_freelist = p;
+extstore.c:    e->page_free++;
+extstore.c:    pthread_mutex_unlock(&e->mutex);
+extstore.c:// TODO: Don't over-evict pages if waiting on refcounts to drop
+extstore.c:    store_engine *e = me->e;
+extstore.c:        calloc(e->page_count, sizeof(struct extstore_page_data));
+extstore.c:    pthread_mutex_lock(&me->mutex);
+extstore.c:        pthread_cond_wait(&me->cond, &me->mutex);
+extstore.c:        pthread_mutex_lock(&e->mutex);
+extstore.c:        if (e->page_free == 0) {
+extstore.c:        pthread_mutex_unlock(&e->mutex);
+extstore.c:        memset(pd, 0, sizeof(struct extstore_page_data) * e->page_count);
+extstore.c:        for (i = 0; i < e->page_count; i++) {
+extstore.c:            store_page *p = &e->pages[i];
+extstore.c:            pthread_mutex_lock(&p->mutex);
+extstore.c:            if (p->active || p->free) {
+extstore.c:                pthread_mutex_unlock(&p->mutex);
+extstore.c:            if (p->obj_count > 0 && !p->closed) {
+extstore.c:                pd[p->id].version = p->version;
+extstore.c:                pd[p->id].bytes_used = p->bytes_used;
+extstore.c:                pd[p->id].bucket = p->bucket;
+extstore.c:                if (p->version < low_version) {
+extstore.c:                    low_version = p->version;
+extstore.c:            if ((p->obj_count == 0 || p->closed) && p->refcount == 0) {
+extstore.c:            pthread_mutex_unlock(&p->mutex);
+extstore.c:            store_page *p = &e->pages[low_page];
+extstore.c:                    p->id, (unsigned long long) p->version);
+extstore.c:            pthread_mutex_lock(&p->mutex);
+extstore.c:            if (!p->closed) {
+extstore.c:                p->closed = true;
+extstore.c:                e->stats.page_evictions++;
+extstore.c:                e->stats.objects_evicted += p->obj_count;
+extstore.c:                e->stats.bytes_evicted += p->bytes_used;
+extstore.c:                if (p->refcount == 0) {
+extstore.c:            pthread_mutex_unlock(&p->mutex);
+extstore.c:        memcpy(e->stats.page_data, pd,
+extstore.c:                sizeof(struct extstore_page_data) * e->page_count);
+hash.c:/* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
+hash.c:            return -1;
+items.c:/* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
+items.c:    if ((it->time <= oldest_live)
+items.c:/* Enable this for reference-count debugging. */
+items.c:                        it, op, it->refcount, \
+items.c:                        (it->it_flags & ITEM_LINKED) ? 'L' : ' ', \
+items.c:                        (it->it_flags & ITEM_SLABBED) ? 'S' : ' ')
+items.c: * Generates the variable-sized part of the header for an object.
+items.c: * key     - The key
+items.c: * nkey    - The length of the key
+items.c: * flags   - key flags
+items.c: * nbytes  - Number of bytes to hold value and addition CRLF terminator
+items.c: * suffix  - Buffer for the "VALUE" line suffix (flags, size).
+items.c: * nsuffix - The length of the suffix is stored here.
+items.c:        *nsuffix = (uint8_t) snprintf(suffix, 40, " %u %d\r\n", flags, nbytes - 2);
+items.c:            total_bytes -= temp_lru_size(id);
+items.c:    nch->head = ch->head;
+items.c:    ch->next = nch;
+items.c:    nch->prev = ch;
+items.c:    nch->next = 0;
+items.c:    nch->used = 0;
+items.c:    nch->slabs_clsid = id;
+items.c:    nch->size = size - sizeof(item_chunk);
+items.c:    nch->it_flags |= ITEM_CHUNK;
+items.c:            it->it_flags |= ITEM_CHUNKED;
+items.c:    assert(it->slabs_clsid == 0);
+items.c:    it->next = it->prev = 0;
+items.c:            exptime - current_time <= settings.temporary_ttl) {
+items.c:        /* There is only COLD in compat-mode */
+items.c:    it->slabs_clsid = id;
+items.c:    it->it_flags |= settings.use_cas ? ITEM_CAS : 0;
+items.c:    it->nkey = nkey;
+items.c:    it->nbytes = nbytes;
+items.c:    it->exptime = exptime;
+items.c:    it->nsuffix = nsuffix;
+items.c:    if (it->it_flags & ITEM_CHUNKED) {
+items.c:        chunk->next = 0;
+items.c:        chunk->prev = 0;
+items.c:        chunk->used = 0;
+items.c:        chunk->size = 0;
+items.c:        chunk->head = it;
+items.c:        chunk->orig_clsid = hdr_id;
+items.c:    it->h_next = 0;
+items.c:    assert((it->it_flags & ITEM_LINKED) == 0);
+items.c:    assert(it != heads[it->slabs_clsid]);
+items.c:    assert(it != tails[it->slabs_clsid]);
+items.c:    assert(it->refcount == 0);
+items.c:    assert((it->it_flags & ITEM_SLABBED) == 0);
+items.c:    head = &heads[it->slabs_clsid];
+items.c:    tail = &tails[it->slabs_clsid];
+items.c:    it->prev = 0;
+items.c:    it->next = *head;
+items.c:    if (it->next) it->next->prev = it;
+items.c:    sizes[it->slabs_clsid]++;
+items.c:    if (it->it_flags & ITEM_HDR) {
+items.c:        sizes_bytes[it->slabs_clsid] += (ITEM_ntotal(it) - it->nbytes) + sizeof(item_hdr);
+items.c:        sizes_bytes[it->slabs_clsid] += ITEM_ntotal(it);
+items.c:    sizes_bytes[it->slabs_clsid] += ITEM_ntotal(it);
+items.c:    pthread_mutex_lock(&lru_locks[it->slabs_clsid]);
+items.c:    pthread_mutex_unlock(&lru_locks[it->slabs_clsid]);
+items.c:    pthread_mutex_lock(&lru_locks[it->slabs_clsid]);
+items.c:    itemstats[it->slabs_clsid].moves_to_warm++;
+items.c:    pthread_mutex_unlock(&lru_locks[it->slabs_clsid]);
+items.c:    head = &heads[it->slabs_clsid];
+items.c:    tail = &tails[it->slabs_clsid];
+items.c:        assert(it->prev == 0);
+items.c:        *head = it->next;
+items.c:        assert(it->next == 0);
+items.c:        *tail = it->prev;
+items.c:    assert(it->next != it);
+items.c:    assert(it->prev != it);
+items.c:    if (it->next) it->next->prev = it->prev;
+items.c:    if (it->prev) it->prev->next = it->next;
+items.c:    sizes[it->slabs_clsid]--;
+items.c:    if (it->it_flags & ITEM_HDR) {
+items.c:        sizes_bytes[it->slabs_clsid] -= (ITEM_ntotal(it) - it->nbytes) + sizeof(item_hdr);
+items.c:        sizes_bytes[it->slabs_clsid] -= ITEM_ntotal(it);
+items.c:    sizes_bytes[it->slabs_clsid] -= ITEM_ntotal(it);
+items.c:    pthread_mutex_lock(&lru_locks[it->slabs_clsid]);
+items.c:    pthread_mutex_unlock(&lru_locks[it->slabs_clsid]);
+items.c:    MEMCACHED_ITEM_LINK(ITEM_key(it), it->nkey, it->nbytes);
+items.c:    assert((it->it_flags & (ITEM_LINKED|ITEM_SLABBED)) == 0);
+items.c:    it->it_flags |= ITEM_LINKED;
+items.c:    it->time = current_time;
+items.c:    MEMCACHED_ITEM_UNLINK(ITEM_key(it), it->nkey, it->nbytes);
+items.c:    if ((it->it_flags & ITEM_LINKED) != 0) {
+items.c:        it->it_flags &= ~ITEM_LINKED;
+items.c:        stats_state.curr_bytes -= ITEM_ntotal(it);
+items.c:        stats_state.curr_items -= 1;
+items.c:        assoc_delete(ITEM_key(it), it->nkey, hv);
+items.c:    MEMCACHED_ITEM_UNLINK(ITEM_key(it), it->nkey, it->nbytes);
+items.c:    if ((it->it_flags & ITEM_LINKED) != 0) {
+items.c:        it->it_flags &= ~ITEM_LINKED;
+items.c:        stats_state.curr_bytes -= ITEM_ntotal(it);
+items.c:        stats_state.curr_items -= 1;
+items.c:        assoc_delete(ITEM_key(it), it->nkey, hv);
+items.c:    MEMCACHED_ITEM_REMOVE(ITEM_key(it), it->nkey, it->nbytes);
+items.c:    assert((it->it_flags & ITEM_SLABBED) == 0);
+items.c:    assert(it->refcount > 0);
+items.c:    MEMCACHED_ITEM_UPDATE(ITEM_key(it), it->nkey, it->nbytes);
+items.c:    if (it->time < current_time - ITEM_UPDATE_INTERVAL) {
+items.c:        assert((it->it_flags & ITEM_SLABBED) == 0);
+items.c:        if ((it->it_flags & ITEM_LINKED) != 0) {
+items.c:            it->time = current_time;
+items.c:    MEMCACHED_ITEM_UPDATE(ITEM_key(it), it->nkey, it->nbytes);
+items.c:        assert((it->it_flags & ITEM_SLABBED) == 0);
+items.c:        if ((it->it_flags & ITEM_LINKED) != 0) {
+items.c:            if (ITEM_lruid(it) == COLD_LRU && (it->it_flags & ITEM_ACTIVE)) {
+items.c:                it->time = current_time;
+items.c:                it->slabs_clsid = ITEM_clsid(it);
+items.c:                it->slabs_clsid |= WARM_LRU;
+items.c:                it->it_flags &= ~ITEM_ACTIVE;
+items.c:            } else if (it->time < current_time - ITEM_UPDATE_INTERVAL) {
+items.c:                it->time = current_time;
+items.c:    } else if (it->time < current_time - ITEM_UPDATE_INTERVAL) {
+items.c:        assert((it->it_flags & ITEM_SLABBED) == 0);
+items.c:        if ((it->it_flags & ITEM_LINKED) != 0) {
+items.c:            it->time = current_time;
+items.c:    MEMCACHED_ITEM_REPLACE(ITEM_key(it), it->nkey, it->nbytes,
+items.c:                           ITEM_key(new_it), new_it->nkey, new_it->nbytes);
+items.c:    assert((it->it_flags & ITEM_SLABBED) == 0);
+items.c:        assert(it->nkey <= KEY_MAX_LENGTH);
+items.c:        if (it->nbytes == 0 && it->nkey == 0) {
+items.c:            it = it->next;
+items.c:        /* Copy the key since it may not be null-terminated in the struct */
+items.c:        strncpy(key_temp, ITEM_key(it), it->nkey);
+items.c:        key_temp[it->nkey] = 0x00; /* terminate */
+items.c:                       key_temp, it->nbytes - 2,
+items.c:                       it->exptime == 0 ? 0 :
+items.c:                       (unsigned long long)it->exptime + process_started);
+items.c:        it = it->next;
+items.c:        cur->outofmemory = itemstats[i].outofmemory;
+items.c:        cur->evicted = itemstats[i].evicted;
+items.c:            cur->age = current_time - tails[i]->time;
+items.c:            cur->age = 0;
+items.c:                age = current_time - tails[i]->time;
+items.c:                age_hot = current_time - tails[i]->time;
+items.c:                age_warm = current_time - tails[i]->time;
+items.c:    if (bucket < stats_sizes_buckets) stats_sizes_hist[bucket]--;
+items.c:            STORAGE_delete(c->thread->storage, it);
+items.c:            pthread_mutex_lock(&c->thread->stats.mutex);
+items.c:            c->thread->stats.get_flushed++;
+items.c:            pthread_mutex_unlock(&c->thread->stats.mutex);
+items.c:                fprintf(stderr, " -nuked by flush");
+items.c:        } else if (it->exptime != 0 && it->exptime <= current_time) {
+items.c:            STORAGE_delete(c->thread->storage, it);
+items.c:            pthread_mutex_lock(&c->thread->stats.mutex);
+items.c:            c->thread->stats.get_expired++;
+items.c:            pthread_mutex_unlock(&c->thread->stats.mutex);
+items.c:                fprintf(stderr, " -nuked by expire");
+items.c:                    if ((it->it_flags & ITEM_ACTIVE) == 0) {
+items.c:                        if ((it->it_flags & ITEM_FETCHED) == 0) {
+items.c:                            it->it_flags |= ITEM_FETCHED;
+items.c:                            it->it_flags |= ITEM_ACTIVE;
+items.c:                            } else if (!lru_bump_async(c->thread->lru_bump_buf, it, hv)) {
+items.c:                                it->it_flags &= ~ITEM_ACTIVE;
+items.c:                    it->it_flags |= ITEM_FETCHED;
+items.c:    LOGGER_LOG(c->thread->l, LOG_FETCHERS, LOGGER_ITEM_GET, NULL, was_found, key, nkey,
+items.c:        it->exptime = exptime;
+items.c:    for (; tries > 0 && search != NULL; tries--, search=next_it) {
+items.c:        /* we might relink search mid-loop, so search->prev isn't reliable */
+items.c:        next_it = search->prev;
+items.c:        if (search->nbytes == 0 && search->nkey == 0 && search->it_flags == 1) {
+items.c:        uint32_t hv = hash(ITEM_key(search), search->nkey);
+items.c:                    search->time + settings.tail_repair_time < current_time) {
+items.c:                search->refcount = 1;
+items.c:                /* This will call item_remove -> item_free since refcnt is 1 */
+items.c:        if ((search->exptime != 0 && search->exptime < current_time)
+items.c:            if ((search->it_flags & ITEM_FETCHED) == 0) {
+items.c:            /* refcnt 2 -> 1 */
+items.c:            /* refcnt 1 -> 0 -> item_free */
+items.c:                if ((search->it_flags & ITEM_ACTIVE) != 0) {
+items.c:                    search->it_flags &= ~ITEM_ACTIVE;
+items.c:                           current_time - search->time > max_age) {
+items.c:                    itemstats[id].evicted_time = current_time - search->time;
+items.c:                    if (search->exptime != 0)
+items.c:                    if ((search->it_flags & ITEM_FETCHED) == 0) {
+items.c:                    if ((search->it_flags & ITEM_ACTIVE)) {
+items.c:                        slabs_reassign(-1, orig_id);
+items.c:                    ret_it->it = it;
+items.c:                    ret_it->hv = hv;
+items.c:                } else if ((search->it_flags & ITEM_ACTIVE) != 0
+items.c:                    search->it_flags &= ~ITEM_ACTIVE;
+items.c:            it->slabs_clsid = ITEM_clsid(it);
+items.c:            it->slabs_clsid |= move_to_lru;
+items.c:    b->prev = 0;
+items.c:    b->next = bump_buf_head;
+items.c:    if (b->next) b->next->prev = b;
+items.c:    b->buf = bipbuf_new(sizeof(lru_bump_entry) * LRU_BUMP_BUF_SIZE);
+items.c:    if (b->buf == NULL) {
+items.c:    pthread_mutex_init(&b->mutex, NULL);
+items.c:    pthread_mutex_lock(&b->mutex);
+items.c:    lru_bump_entry *be = (lru_bump_entry *) bipbuf_request(b->buf, sizeof(lru_bump_entry));
+items.c:        be->it = it;
+items.c:        be->hv = hv;
+items.c:        if (bipbuf_push(b->buf, sizeof(lru_bump_entry)) == 0) {
+items.c:            b->dropped++;
+items.c:        b->dropped++;
+items.c:    pthread_mutex_unlock(&b->mutex);
+items.c:/* TODO: Might be worth a micro-optimization of having bump buffers link
+items.c: * non-zero, then remove from list if zero more than N times.
+items.c:    for (b = bump_buf_head; b != NULL; b=b->next) {
+items.c:        pthread_mutex_lock(&b->mutex);
+items.c:        be = (lru_bump_entry *) bipbuf_peek_all(b->buf, &size);
+items.c:        pthread_mutex_unlock(&b->mutex);
+items.c:            item_lock(be->hv);
+items.c:            do_item_update(be->it);
+items.c:            do_item_remove(be->it);
+items.c:            item_unlock(be->hv);
+items.c:            todo -= sizeof(lru_bump_entry);
+items.c:        pthread_mutex_lock(&b->mutex);
+items.c:        be = (lru_bump_entry *) bipbuf_poll(b->buf, size);
+items.c:        pthread_mutex_unlock(&b->mutex);
+items.c:    for (b = bump_buf_head; b != NULL; b=b->next) {
+items.c:        pthread_mutex_lock(&b->mutex);
+items.c:        total += b->dropped;
+items.c:        pthread_mutex_unlock(&b->mutex);
+items.c:        total_bytes -= temp_lru_size(slabs_clsid);
+items.c:            cold_age = current_time - tails[slabs_clsid|COLD_LRU]->time;
+items.c:    // TODO: If not segmented LRU, skip non-cold
+items.c:        crawlerstats_t *s = &cdata->crawlerstats[i];
+items.c:        if (s->run_complete) {
+items.c:            pthread_mutex_lock(&cdata->lock);
+items.c:            uint64_t possible_reclaims = s->seen - s->noexp;
+items.c:            rel_time_t since_run = current_time - s->end_time;
+items.c:                available_reclaims += s->histo[x];
+items.c:                        next_crawl_wait[i] -= 60;
+items.c:                    next_crawls[i] - current_time,
+items.c:                    s->end_time - s->start_time,
+items.c:                    s->seen,
+items.c:                    s->reclaimed);
+items.c:            s->run_complete = false;
+items.c:            pthread_mutex_unlock(&cdata->lock);
+items.c:    pthread_mutex_init(&cdata->lock, NULL);
+items.c:    cdata->crawl_complete = true; // kick off the crawler.
+items.c:    void *am = sam->init(&settings);
+items.c:            next_juggles[i] = next_juggles[i] > last_sleep ? next_juggles[i] - last_sleep : 0;
+items.c:                sam->free(am);
+items.c:                am = sam->init(&settings);
+items.c:            sam->run(am, &src, &dst);
+items.c:            if (src != -1 && dst != -1) {
+items.c:    sam->free(am);
+items.c:        return -1;
+items.c:        return -1;
+items.c:    assert(it->it_flags == 1);
+items.c:    assert(it->nbytes == 0);
+items.c:    head = &heads[it->slabs_clsid];
+items.c:    tail = &tails[it->slabs_clsid];
+items.c:    it->prev = *tail;
+items.c:    it->next = 0;
+items.c:    if (it->prev) {
+items.c:        assert(it->prev->next == 0);
+items.c:        it->prev->next = it;
+items.c:    head = &heads[it->slabs_clsid];
+items.c:    tail = &tails[it->slabs_clsid];
+items.c:        assert(it->prev == 0);
+items.c:        *head = it->next;
+items.c:        assert(it->next == 0);
+items.c:        *tail = it->prev;
+items.c:    assert(it->next != it);
+items.c:    assert(it->prev != it);
+items.c:    if (it->next) it->next->prev = it->prev;
+items.c:    if (it->prev) it->prev->next = it->next;
+items.c:    assert(it->it_flags == 1);
+items.c:    assert(it->nbytes == 0);
+items.c:    head = &heads[it->slabs_clsid];
+items.c:    tail = &tails[it->slabs_clsid];
+items.c:    if (it->prev == 0) {
+items.c:        if (it->next) {
+items.c:            *head = it->next;
+items.c:            assert(it->next->prev == it);
+items.c:            it->next->prev = 0;
+items.c:    assert(it->prev != it);
+items.c:    if (it->prev) {
+items.c:        if (*head == it->prev) {
+items.c:            *tail = it->prev;
+items.c:        assert(it->next != it);
+items.c:        if (it->next) {
+items.c:            assert(it->prev->next == it);
+items.c:            it->prev->next = it->next;
+items.c:            it->next->prev = it->prev;
+items.c:            it->prev->next = 0;
+items.c:        /* prev->prev's next is it->prev */
+items.c:        it->next = it->prev;
+items.c:        it->prev = it->next->prev;
+items.c:        it->next->prev = it;
+items.c:        /* New it->prev now, if we're not at the head. */
+items.c:        if (it->prev) {
+items.c:            it->prev->next = it;
+items.c:    assert(it->next != it);
+items.c:    assert(it->prev != it);
+items.c:    return it->next; /* success */
+itoa_ljust.c://=== itoa_ljust.cpp - Fast integer to ascii conversion           --*- C++ -*-//
+itoa_ljust.c://    2) Avoids GOTO statements - uses "switch" instead and relies on
+itoa_ljust.c://    3) Avoids unary minus of signed types - undefined behavior if value
+itoa_ljust.c://    4) Uses memcpy to store 2 digits at a time - lets the compiler
+itoa_ljust.c://       generate a 2-byte load/store in platforms that support
+itoa_ljust.c:// Copyright (c) 2016 Arturo Martin-de-Nicolas
+itoa_ljust.c:// Released under the BSD 3-Clause License, see Google's original copyright
+itoa_ljust.c://===----------------------------------------------------------------------===//
+itoa_ljust.c:// Protocol Buffers - Google's data interchange format
+itoa_ljust.c:// https://developers.google.com/protocol-buffers/
+itoa_ljust.c://===----------------------------------------------------------------------===//
+itoa_ljust.c:        --n;
+itoa_ljust.c:    case  9: u -= d * 100000000;
+itoa_ljust.c:    case  7: u -= d *   1000000;
+itoa_ljust.c:    case  5: u -= d *     10000;
+itoa_ljust.c:    case  3: u -= d *       100;
+itoa_ljust.c:        *p++ = '-';
+itoa_ljust.c:        u = -u;
+itoa_ljust.c:    lower = u - (upper * 1000000000);
+itoa_ljust.c:        *p++ = '-';
+itoa_ljust.c:        u = -u;
+jenkins_hash.c:/* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
+jenkins_hash.c: * whether it's big or little-endian. ENDIAN_LITTLE and ENDIAN_BIG
+jenkins_hash.c:#define rot(x,k) (((x)<<(k)) ^ ((x)>>(32-(k))))
+jenkins_hash.c:-------------------------------------------------------------------------------
+jenkins_hash.c:mix -- mix 3 32-bit values reversibly.
+jenkins_hash.c:* "differ" is defined as +, -, ^, or ~^.  For + and -, I transformed
+jenkins_hash.c:  is commonly produced by subtraction) look like a single 1-bit
+jenkins_hash.c:Some k values for my "a-=c; a^=rot(c,k); c+=b;" arrangement that
+jenkins_hash.c:for "differ" defined as + with a one-bit base and a two-bit delta.  I
+jenkins_hash.c:This allows some parallelism.  Read-after-writes are good at doubling
+jenkins_hash.c:-------------------------------------------------------------------------------
+jenkins_hash.c:  a -= c;  a ^= rot(c, 4);  c += b; \
+jenkins_hash.c:  b -= a;  b ^= rot(a, 6);  a += c; \
+jenkins_hash.c:  c -= b;  c ^= rot(b, 8);  b += a; \
+jenkins_hash.c:  a -= c;  a ^= rot(c,16);  c += b; \
+jenkins_hash.c:  b -= a;  b ^= rot(a,19);  a += c; \
+jenkins_hash.c:  c -= b;  c ^= rot(b, 4);  b += a; \
+jenkins_hash.c:-------------------------------------------------------------------------------
+jenkins_hash.c:final -- final mixing of 3 32-bit values (a,b,c) into c
+jenkins_hash.c:* "differ" is defined as +, -, ^, or ~^.  For + and -, I transformed
+jenkins_hash.c:  is commonly produced by subtraction) look like a single 1-bit
+jenkins_hash.c:-------------------------------------------------------------------------------
+jenkins_hash.c:  c ^= b; c -= rot(b,14); \
+jenkins_hash.c:  a ^= c; a -= rot(c,11); \
+jenkins_hash.c:  b ^= a; b -= rot(a,25); \
+jenkins_hash.c:  c ^= b; c -= rot(b,16); \
+jenkins_hash.c:  a ^= c; a -= rot(c,4);  \
+jenkins_hash.c:  b ^= a; b -= rot(a,14); \
+jenkins_hash.c:  c ^= b; c -= rot(b,24); \
+jenkins_hash.c:    const uint32_t *k = key;                           /* read 32-bit chunks */
+jenkins_hash.c:    /*------ all but last block: aligned reads and affect 32 bits of (a,b,c) */
+jenkins_hash.c:      length -= 12;
+jenkins_hash.c:    /*----------------------------- handle the last (probably partial) block */
+jenkins_hash.c:     * string is aligned, the masked-off tail is in the same word as the
+jenkins_hash.c:    const uint16_t *k = key;                           /* read 16-bit chunks */
+jenkins_hash.c:    /*--------------- all but last block: aligned reads and different mixing */
+jenkins_hash.c:      length -= 12;
+jenkins_hash.c:    /*----------------------------- handle the last (probably partial) block */
+jenkins_hash.c:    /*--------------- all but the last block: affect some 32 bits of (a,b,c) */
+jenkins_hash.c:      length -= 12;
+jenkins_hash.c:    /*-------------------------------- last block: affect all 32 bits of (c) */
+jenkins_hash.c: * This is the same as hashword() on big-endian machines.  It is different
+jenkins_hash.c: * big-endian byte ordering.
+jenkins_hash.c:    const uint32_t *k = key;                           /* read 32-bit chunks */
+jenkins_hash.c:    /*------ all but last block: aligned reads and affect 32 bits of (a,b,c) */
+jenkins_hash.c:      length -= 12;
+jenkins_hash.c:    /*----------------------------- handle the last (probably partial) block */
+jenkins_hash.c:    /*--------------- all but the last block: affect some 32 bits of (a,b,c) */
+jenkins_hash.c:      length -= 12;
+jenkins_hash.c:    /*-------------------------------- last block: affect all 32 bits of (c) */
+logger.c:/* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
+logger.c:#define WATCHER_ALL -1
+logger.c:    l->prev = 0;
+logger.c:    l->next = logger_stack_head;
+logger.c:    if (l->next) l->next->prev = l;
+logger.c:        assert(l->prev == 0);
+logger.c:        logger_stack_head = l->next;
+logger.c:        assert(l->next == 0);
+logger.c:        logger_stack_tail = l->prev;
+logger.c:    assert(l->next != l);
+logger.c:    assert(l->prev != l);
+logger.c:    if (l->next) l->next->prev = l->prev;
+logger.c:    if (l->prev) l->prev->next = l->next;
+logger.c:    logger_count--;
+logger.c:        f |= w->eflags;
+logger.c:    for (l = logger_stack_head; l != NULL; l=l->next) {
+logger.c:        pthread_mutex_lock(&l->mutex);
+logger.c:        l->eflags = f;
+logger.c:        pthread_mutex_unlock(&l->mutex);
+logger.c: * Logger background thread functions. Aggregates per-worker buffers and
+logger.c:    struct logentry_item_store *le = (struct logentry_item_store *) e->data;
+logger.c:    if (le->cmd <= 5)
+logger.c:        cmd = cmd_map[le->cmd];
+logger.c:    uriencode(le->key, keybuf, le->nkey, LOGGER_PARSE_SCRATCH);
+logger.c:            (int)e->tv.tv_sec, (int)e->tv.tv_usec, (unsigned long long) e->gid,
+logger.c:            keybuf, status_map[le->status], cmd, le->ttl, le->clsid);
+logger.c:    struct logentry_item_get *le = (struct logentry_item_get *) e->data;
+logger.c:    uriencode(le->key, keybuf, le->nkey, LOGGER_PARSE_SCRATCH);
+logger.c:            (int)e->tv.tv_sec, (int)e->tv.tv_usec, (unsigned long long) e->gid,
+logger.c:            keybuf, was_found_map[le->was_found], le->clsid);
+logger.c:    struct logentry_eviction *le = (struct logentry_eviction *) e->data;
+logger.c:    uriencode(le->key, keybuf, le->nkey, LOGGER_PARSE_SCRATCH);
+logger.c:            (int)e->tv.tv_sec, (int)e->tv.tv_usec, (unsigned long long) e->gid,
+logger.c:            keybuf, (le->it_flags & ITEM_FETCHED) ? "yes" : "no",
+logger.c:            (long long int)le->exptime, le->latime, le->clsid);
+logger.c:    struct logentry_ext_write *le = (struct logentry_ext_write *) e->data;
+logger.c:    uriencode(le->key, keybuf, le->nkey, LOGGER_PARSE_SCRATCH);
+logger.c:            (int)e->tv.tv_sec, (int)e->tv.tv_usec, (unsigned long long) e->gid,
+logger.c:            keybuf, (le->it_flags & ITEM_FETCHED) ? "yes" : "no",
+logger.c:            (long long int)le->exptime, le->latime, le->clsid, le->bucket);
+logger.c:    switch (e->event) {
+logger.c:                        (int)e->tv.tv_sec, (int)e->tv.tv_usec,
+logger.c:                        (unsigned long long) e->gid, (char *) e->data);
+logger.c:        if (w == NULL || (e->eflags & w->eflags) == 0)
+logger.c:        while (!w->failed_flush &&
+logger.c:                (skip_scr = (char *) bipbuf_request(w->buf, scratch_len + 128)) == NULL) {
+logger.c:                w->failed_flush = true;
+logger.c:        if (w->failed_flush) {
+logger.c:            L_DEBUG("LOGGER: Fast skipped for watcher [%d] due to failed_flush\n", w->sfd);
+logger.c:            w->skipped++;
+logger.c:            ls->watcher_skipped++;
+logger.c:        if (w->skipped > 0) {
+logger.c:            total = snprintf(skip_scr, 128, "skipped=%llu\n", (unsigned long long) w->skipped);
+logger.c:                L_DEBUG("LOGGER: Failed to flatten skipped message into watcher [%d]\n", w->sfd);
+logger.c:                w->skipped++;
+logger.c:                ls->watcher_skipped++;
+logger.c:            bipbuf_push(w->buf, total);
+logger.c:            w->skipped = 0;
+logger.c:        bipbuf_offer(w->buf, (unsigned char *) scratch, scratch_len);
+logger.c:        ls->watcher_sent++;
+logger.c:    watchers[w->id] = NULL;
+logger.c:    sidethread_conn_close(w->c);
+logger.c:    watcher_count--;
+logger.c:    bipbuf_free(w->buf);
+logger.c:    pthread_mutex_lock(&l->mutex);
+logger.c:    data = bipbuf_peek_all(l->buf, &size);
+logger.c:    pthread_mutex_unlock(&l->mutex);
+logger.c:        pos += sizeof(logentry) + e->size + e->pad;
+logger.c:    pthread_mutex_lock(&l->mutex);
+logger.c:    data = bipbuf_poll(l->buf, size);
+logger.c:    ls->worker_written += l->written;
+logger.c:    ls->worker_dropped += l->dropped;
+logger.c:    l->written = 0;
+logger.c:    l->dropped = 0;
+logger.c:    pthread_mutex_unlock(&l->mutex);
+logger.c: * micro-optimize later.
+logger.c:        data = bipbuf_peek_all(w->buf, &data_size);
+logger.c:            watchers_pollfds[nfd].fd = w->sfd;
+logger.c:            watchers_pollfds[nfd].fd = w->sfd;
+logger.c:        w->failed_flush = false;
+logger.c:        return -1;
+logger.c:            int res = read(w->sfd, buf, 1);
+logger.c:            if (res == 0 || (res == -1 && (errno != EAGAIN && errno != EWOULDBLOCK))) {
+logger.c:        if ((data = bipbuf_peek_all(w->buf, &data_size)) != NULL) {
+logger.c:                switch (w->t) {
+logger.c:                        total = write(w->sfd, data, data_size);
+logger.c:                L_DEBUG("LOGGER: poll() wrote %d to %d (data_size: %d) (bipbuf_used: %d)\n", total, w->sfd,
+logger.c:                        data_size, bipbuf_used(w->buf));
+logger.c:                if (total == -1) {
+logger.c:                    bipbuf_poll(w->buf, total);
+logger.c:    stats.log_worker_dropped  += ls->worker_dropped;
+logger.c:    stats.log_worker_written  += ls->worker_written;
+logger.c:    stats.log_watcher_skipped += ls->watcher_skipped;
+logger.c:    stats.log_watcher_sent    += ls->watcher_sent;
+logger.c:        for (l = logger_stack_head; l != NULL; l=l->next) {
+logger.c:        return -1;
+logger.c: * initializes the per-thread bipbuf, links it into the list of loggers
+logger.c:    l->buf = bipbuf_new(settings.logger_buf_size);
+logger.c:    if (l->buf == NULL) {
+logger.c:    l->entry_map = default_entries;
+logger.c:    pthread_mutex_init(&l->mutex, NULL);
+logger.c:    struct logentry_eviction *le = (struct logentry_eviction *) e->data;
+logger.c:    le->exptime = (it->exptime > 0) ? (long long int)(it->exptime - current_time) : (long long int) -1;
+logger.c:    le->latime = current_time - it->time;
+logger.c:    le->it_flags = it->it_flags;
+logger.c:    le->nkey = it->nkey;
+logger.c:    le->clsid = ITEM_clsid(it);
+logger.c:    memcpy(le->key, ITEM_key(it), it->nkey);
+logger.c:    e->size = sizeof(struct logentry_eviction) + le->nkey;
+logger.c:    struct logentry_ext_write *le = (struct logentry_ext_write *) e->data;
+logger.c:    le->exptime = (it->exptime > 0) ? (long long int)(it->exptime - current_time) : (long long int) -1;
+logger.c:    le->latime = current_time - it->time;
+logger.c:    le->it_flags = it->it_flags;
+logger.c:    le->nkey = it->nkey;
+logger.c:    le->clsid = ITEM_clsid(it);
+logger.c:    le->bucket = bucket;
+logger.c:    memcpy(le->key, ITEM_key(it), it->nkey);
+logger.c:    e->size = sizeof(struct logentry_ext_write) + le->nkey;
+logger.c:    struct logentry_item_get *le = (struct logentry_item_get *) e->data;
+logger.c:    le->was_found = was_found;
+logger.c:    le->nkey = nkey;
+logger.c:    le->clsid = clsid;
+logger.c:    memcpy(le->key, key, nkey);
+logger.c:    e->size = sizeof(struct logentry_item_get) + nkey;
+logger.c:    struct logentry_item_store *le = (struct logentry_item_store *) e->data;
+logger.c:    le->status = status;
+logger.c:    le->cmd = comm;
+logger.c:    le->nkey = nkey;
+logger.c:    le->clsid = clsid;
+logger.c:        le->ttl = ttl - current_time;
+logger.c:        le->ttl = 0;
+logger.c:    memcpy(le->key, key, nkey);
+logger.c:    e->size = sizeof(struct logentry_item_store) + nkey;
+logger.c:    bipbuf_t *buf = l->buf;
+logger.c:    const entry_details *d = &l->entry_map[event];
+logger.c:    int reqlen = d->reqlen;
+logger.c:    pthread_mutex_lock(&l->mutex);
+logger.c:        pthread_mutex_unlock(&l->mutex);
+logger.c:        l->dropped++;
+logger.c:    e->event = d->subtype;
+logger.c:    e->pad = 0;
+logger.c:    e->gid = logger_get_gid();
+logger.c:    e->eflags = d->eflags;
+logger.c:    gettimeofday(&e->tv, NULL);
+logger.c:    switch (d->subtype) {
+logger.c:            total = vsnprintf((char *) e->data, reqlen, d->format, ap);
+logger.c:            e->size = total + 1; /* null byte */
+logger.c:    if (sizeof(logentry) + e->size % 8 != 0) {
+logger.c:        e->pad = 8 - (sizeof(logentry) + e->size % 8);
+logger.c:    if (bipbuf_push(buf, (sizeof(logentry) + e->size + e->pad)) == 0) {
+logger.c:        pthread_mutex_unlock(&l->mutex);
+logger.c:    l->written++;
+logger.c:            (sizeof(logentry) + e->size));
+logger.c:    pthread_mutex_unlock(&l->mutex);
+logger.c:    for (x = 0; x < WATCHER_LIMIT-1; x++) {
+logger.c:    w->c = c;
+logger.c:    w->sfd = sfd;
+logger.c:        w->t = LOGGER_WATCHER_STDERR;
+logger.c:        w->t = LOGGER_WATCHER_CLIENT;
+logger.c:    w->id = x;
+logger.c:    w->eflags = f;
+logger.c:    w->buf = bipbuf_new(settings.logger_watcher_buf_size);
+logger.c:    if (w->buf == NULL) {
+logger.c:    bipbuf_offer(w->buf, (unsigned char *) "OK\r\n", 4);
+memcached.c:/* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
+memcached.c: *  memcached - memory caching daemon
+memcached.c:    TRANSMIT_HARD_ERROR  /** Can't write (c->state is set to conn_closing) */
+memcached.c:    if (fd == -42 || allow_new_conns == false) {
+memcached.c:    /* no. of seconds in 30 days - largest possible delta exptime */
+memcached.c:        return (rel_time_t)(exptime - process_started);
+memcached.c:       did, so time(0) - time.started is never zero.  if so, things
+memcached.c:    process_started = time(0) - ITEM_UPDATE_INTERVAL - 2;
+memcached.c:    settings.maxconns = 1024;         /* to limit connections-related memory to about 5MB */
+memcached.c: * Returns 0 on success, -1 on out-of-memory.
+memcached.c:    if (c->msgsize == c->msgused) {
+memcached.c:        msg = realloc(c->msglist, c->msgsize * 2 * sizeof(struct msghdr));
+memcached.c:            return -1;
+memcached.c:        c->msglist = msg;
+memcached.c:        c->msgsize *= 2;
+memcached.c:    msg = c->msglist + c->msgused;
+memcached.c:    msg->msg_iov = &c->iov[c->iovused];
+memcached.c:    if (IS_UDP(c->transport) && c->request_addr_size > 0) {
+memcached.c:        msg->msg_name = &c->request_addr;
+memcached.c:        msg->msg_namelen = c->request_addr_size;
+memcached.c:    c->msgbytes = 0;
+memcached.c:    c->msgused++;
+memcached.c:    if (IS_UDP(c->transport)) {
+memcached.c:            if (!IS_TCP(c->transport))
+memcached.c:            if (c->state != conn_new_cmd && c->state != conn_read)
+memcached.c:            if ((current_time - c->last_cmd_time) > settings.idle_timeout) {
+memcached.c:                if (write(c->thread->notify_send_fd, buf, TIMEOUT_MSG_SIZE)
+memcached.c:                if (c->last_cmd_time < oldest_last_cmd)
+memcached.c:                    oldest_last_cmd = c->last_cmd_time;
+memcached.c:        sleep_time = settings.idle_timeout - (current_time - oldest_last_cmd) + 1;
+memcached.c:        return -1;
+memcached.c:        return -1;
+memcached.c:            rv = "auto-negotiate";
+memcached.c:        (current_time - c->last_cmd_time) > settings.idle_timeout) {
+memcached.c:        if (c->state != conn_new_cmd && c->state != conn_read) {
+memcached.c:                    "fd %d wants to timeout, but isn't in read state", c->sfd);
+memcached.c:            fprintf(stderr, "Closing idle fd %d\n", c->sfd);
+memcached.c:        c->thread->stats.idle_kicks++;
+memcached.c:    c->ev_flags = EV_READ | EV_PERSIST;
+memcached.c:    event_set(&c->event, c->sfd, c->ev_flags, event_handler, (void *)c);
+memcached.c:    event_base_set(c->thread->base, &c->event);
+memcached.c:    c->state = conn_new_cmd;
+memcached.c:    if (event_add(&c->event, 0) == -1) {
+memcached.c:    if (c->io_wraplist) {
+memcached.c:        //assert(c->io_wrapleft == 0); // assert no more to process
+memcached.c:        c->rbuf = c->wbuf = 0;
+memcached.c:        c->ilist = 0;
+memcached.c:        c->suffixlist = 0;
+memcached.c:        c->iov = 0;
+memcached.c:        c->msglist = 0;
+memcached.c:        c->hdrbuf = 0;
+memcached.c:        c->rsize = read_buffer_size;
+memcached.c:        c->wsize = DATA_BUFFER_SIZE;
+memcached.c:        c->isize = ITEM_LIST_INITIAL;
+memcached.c:        c->suffixsize = SUFFIX_LIST_INITIAL;
+memcached.c:        c->iovsize = IOV_LIST_INITIAL;
+memcached.c:        c->msgsize = MSG_LIST_INITIAL;
+memcached.c:        c->hdrsize = 0;
+memcached.c:        c->rbuf = (char *)malloc((size_t)c->rsize);
+memcached.c:        c->wbuf = (char *)malloc((size_t)c->wsize);
+memcached.c:        c->ilist = (item **)malloc(sizeof(item *) * c->isize);
+memcached.c:        c->suffixlist = (char **)malloc(sizeof(char *) * c->suffixsize);
+memcached.c:        c->iov = (struct iovec *)malloc(sizeof(struct iovec) * c->iovsize);
+memcached.c:        c->msglist = (struct msghdr *)malloc(sizeof(struct msghdr) * c->msgsize);
+memcached.c:        if (c->rbuf == 0 || c->wbuf == 0 || c->ilist == 0 || c->iov == 0 ||
+memcached.c:                c->msglist == 0 || c->suffixlist == 0) {
+memcached.c:        c->sfd = sfd;
+memcached.c:    c->transport = transport;
+memcached.c:    c->protocol = settings.binding_protocol;
+memcached.c:        c->request_addr_size = sizeof(c->request_addr);
+memcached.c:        c->request_addr_size = 0;
+memcached.c:        if (getpeername(sfd, (struct sockaddr *) &c->request_addr,
+memcached.c:                        &c->request_addr_size)) {
+memcached.c:            memset(&c->request_addr, 0, sizeof(c->request_addr));
+memcached.c:                prot_text(c->protocol));
+memcached.c:        } else if (c->protocol == negotiating_prot) {
+memcached.c:            fprintf(stderr, "<%d new auto-negotiating client connection\n",
+memcached.c:        } else if (c->protocol == ascii_prot) {
+memcached.c:        } else if (c->protocol == binary_prot) {
+memcached.c:                sfd, c->protocol);
+memcached.c:    c->state = init_state;
+memcached.c:    c->rlbytes = 0;
+memcached.c:    c->cmd = -1;
+memcached.c:    c->rbytes = c->wbytes = 0;
+memcached.c:    c->wcurr = c->wbuf;
+memcached.c:    c->rcurr = c->rbuf;
+memcached.c:    c->ritem = 0;
+memcached.c:    c->icurr = c->ilist;
+memcached.c:    c->suffixcurr = c->suffixlist;
+memcached.c:    c->ileft = 0;
+memcached.c:    c->suffixleft = 0;
+memcached.c:    c->iovused = 0;
+memcached.c:    c->msgcurr = 0;
+memcached.c:    c->msgused = 0;
+memcached.c:    c->authenticated = false;
+memcached.c:    c->last_cmd_time = current_time; /* initialize for idle kicker */
+memcached.c:    c->io_wraplist = NULL;
+memcached.c:    c->io_wrapleft = 0;
+memcached.c:    c->write_and_go = init_state;
+memcached.c:    c->write_and_free = 0;
+memcached.c:    c->item = 0;
+memcached.c:    c->noreply = false;
+memcached.c:    event_set(&c->event, sfd, event_flags, event_handler, (void *)c);
+memcached.c:    event_base_set(base, &c->event);
+memcached.c:    c->ev_flags = event_flags;
+memcached.c:    if (event_add(&c->event, 0) == -1) {
+memcached.c:    MEMCACHED_CONN_ALLOCATE(c->sfd);
+memcached.c:    it = (item *)wrap->io.buf;
+memcached.c:    if (wrap->miss) {
+memcached.c:        size_t ntotal = ITEM_ntotal(wrap->hdr_it);
+memcached.c:        item_unlink(wrap->hdr_it);
+memcached.c:        pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:        c->thread->stats.miss_from_extstore++;
+memcached.c:        if (wrap->badcrc)
+memcached.c:            c->thread->stats.badcrc_from_extstore++;
+memcached.c:        pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:        uint32_t hv = (uint32_t)it->time;
+memcached.c:            item *h_it = wrap->hdr_it;
+memcached.c:            if (((h_it->it_flags & flags) == flags) &&
+memcached.c:                    h_it->time > current_time - ITEM_UPDATE_INTERVAL &&
+memcached.c:                    c->recache_counter++ % settings.ext_recache_rate == 0) {
+memcached.c:                it->exptime = h_it->exptime;
+memcached.c:                it->it_flags &= ~ITEM_LINKED;
+memcached.c:                it->refcount = 0;
+memcached.c:                it->h_next = NULL; // might not be necessary.
+memcached.c:                STORAGE_delete(c->thread->storage, h_it);
+memcached.c:                pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:                c->thread->stats.recache_from_extstore++;
+memcached.c:                pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:    wrap->io.buf = NULL; // sanity.
+memcached.c:    wrap->io.next = NULL;
+memcached.c:    wrap->next = NULL;
+memcached.c:    wrap->active = false;
+memcached.c:    item_remove(wrap->hdr_it);
+memcached.c:    if (c->item) {
+memcached.c:        item_remove(c->item);
+memcached.c:        c->item = 0;
+memcached.c:    while (c->ileft > 0) {
+memcached.c:        item *it = *(c->icurr);
+memcached.c:        assert((it->it_flags & ITEM_SLABBED) == 0);
+memcached.c:        c->icurr++;
+memcached.c:        c->ileft--;
+memcached.c:    if (c->suffixleft != 0) {
+memcached.c:        for (; c->suffixleft > 0; c->suffixleft--, c->suffixcurr++) {
+memcached.c:            do_cache_free(c->thread->suffix_cache, *(c->suffixcurr));
+memcached.c:    if (c->io_wraplist) {
+memcached.c:        io_wrap *tmp = c->io_wraplist;
+memcached.c:            io_wrap *next = tmp->next;
+memcached.c:            do_cache_free(c->thread->io_cache, tmp); // lockless
+memcached.c:        c->io_wraplist = NULL;
+memcached.c:    c->icurr = c->ilist;
+memcached.c:    c->suffixcurr = c->suffixlist;
+memcached.c:    if (c->write_and_free) {
+memcached.c:        free(c->write_and_free);
+memcached.c:        c->write_and_free = 0;
+memcached.c:    if (c->sasl_conn) {
+memcached.c:        sasl_dispose(&c->sasl_conn);
+memcached.c:        c->sasl_conn = NULL;
+memcached.c:    if (IS_UDP(c->transport)) {
+memcached.c:        assert(c->sfd >= 0 && c->sfd < max_fds);
+memcached.c:        conns[c->sfd] = NULL;
+memcached.c:        if (c->hdrbuf)
+memcached.c:            free(c->hdrbuf);
+memcached.c:        if (c->msglist)
+memcached.c:            free(c->msglist);
+memcached.c:        if (c->rbuf)
+memcached.c:            free(c->rbuf);
+memcached.c:        if (c->wbuf)
+memcached.c:            free(c->wbuf);
+memcached.c:        if (c->ilist)
+memcached.c:            free(c->ilist);
+memcached.c:        if (c->suffixlist)
+memcached.c:            free(c->suffixlist);
+memcached.c:        if (c->iov)
+memcached.c:            free(c->iov);
+memcached.c:    event_del(&c->event);
+memcached.c:        fprintf(stderr, "<%d connection closed.\n", c->sfd);
+memcached.c:    MEMCACHED_CONN_RELEASE(c->sfd);
+memcached.c:    close(c->sfd);
+memcached.c:    stats_state.curr_conns--;
+memcached.c:    if (IS_UDP(c->transport))
+memcached.c:    if (c->rsize > READ_BUFFER_HIGHWAT && c->rbytes < DATA_BUFFER_SIZE) {
+memcached.c:        if (c->rcurr != c->rbuf)
+memcached.c:            memmove(c->rbuf, c->rcurr, (size_t)c->rbytes);
+memcached.c:        newbuf = (char *)realloc((void *)c->rbuf, DATA_BUFFER_SIZE);
+memcached.c:            c->rbuf = newbuf;
+memcached.c:            c->rsize = DATA_BUFFER_SIZE;
+memcached.c:        c->rcurr = c->rbuf;
+memcached.c:    if (c->isize > ITEM_LIST_HIGHWAT) {
+memcached.c:        item **newbuf = (item**) realloc((void *)c->ilist, ITEM_LIST_INITIAL * sizeof(c->ilist[0]));
+memcached.c:            c->ilist = newbuf;
+memcached.c:            c->isize = ITEM_LIST_INITIAL;
+memcached.c:    if (c->msgsize > MSG_LIST_HIGHWAT) {
+memcached.c:        struct msghdr *newbuf = (struct msghdr *) realloc((void *)c->msglist, MSG_LIST_INITIAL * sizeof(c->msglist[0]));
+memcached.c:            c->msglist = newbuf;
+memcached.c:            c->msgsize = MSG_LIST_INITIAL;
+memcached.c:    if (c->iovsize > IOV_LIST_HIGHWAT) {
+memcached.c:        struct iovec *newbuf = (struct iovec *) realloc((void *)c->iov, IOV_LIST_INITIAL * sizeof(c->iov[0]));
+memcached.c:            c->iov = newbuf;
+memcached.c:            c->iovsize = IOV_LIST_INITIAL;
+memcached.c:    if (state != c->state) {
+memcached.c:                    c->sfd, state_text(c->state),
+memcached.c:            MEMCACHED_PROCESS_COMMAND_END(c->sfd, c->wbuf, c->wbytes);
+memcached.c:        c->state = state;
+memcached.c: * Returns 0 on success, -1 on out-of-memory.
+memcached.c:    if (c->iovused >= c->iovsize) {
+memcached.c:        struct iovec *new_iov = (struct iovec *)realloc(c->iov,
+memcached.c:                                (c->iovsize * 2) * sizeof(struct iovec));
+memcached.c:            return -1;
+memcached.c:        c->iov = new_iov;
+memcached.c:        c->iovsize *= 2;
+memcached.c:        for (i = 0, iovnum = 0; i < c->msgused; i++) {
+memcached.c:            c->msglist[i].msg_iov = &c->iov[iovnum];
+memcached.c:            iovnum += c->msglist[i].msg_iovlen;
+memcached.c: * Returns 0 on success, -1 on out-of-memory.
+memcached.c:    if (IS_UDP(c->transport)) {
+memcached.c:            m = &c->msglist[c->msgused - 1];
+memcached.c:            if (m->msg_iovlen == IOV_MAX ||
+memcached.c:                (c->msgbytes >= UDP_MAX_PAYLOAD_SIZE)) {
+memcached.c:                m = &c->msglist[c->msgused - 1];
+memcached.c:                return -1;
+memcached.c:            if (len + c->msgbytes > UDP_MAX_PAYLOAD_SIZE) {
+memcached.c:                leftover = len + c->msgbytes - UDP_MAX_PAYLOAD_SIZE;
+memcached.c:                len -= leftover;
+memcached.c:            m = &c->msglist[c->msgused - 1];
+memcached.c:            m->msg_iov[m->msg_iovlen].iov_base = (void *)buf;
+memcached.c:            m->msg_iov[m->msg_iovlen].iov_len = len;
+memcached.c:            c->msgbytes += len;
+memcached.c:            c->iovused++;
+memcached.c:            m->msg_iovlen++;
+memcached.c:        m = &c->msglist[c->msgused - 1];
+memcached.c:        if (m->msg_iovlen == IOV_MAX) {
+memcached.c:            m = &c->msglist[c->msgused - 1];
+memcached.c:            return -1;
+memcached.c:        m->msg_iov[m->msg_iovlen].iov_base = (void *)buf;
+memcached.c:        m->msg_iov[m->msg_iovlen].iov_len = len;
+memcached.c:        c->msgbytes += len;
+memcached.c:        c->iovused++;
+memcached.c:        m->msg_iovlen++;
+memcached.c:    assert(it->it_flags & ITEM_CHUNKED);
+memcached.c:        int todo = (len > ch->used) ? ch->used : len;
+memcached.c:        if (add_iov(c, ch->data, todo) != 0) {
+memcached.c:            return -1;
+memcached.c:        ch = ch->next;
+memcached.c:        len -= todo;
+memcached.c:    if (c->msgused > c->hdrsize) {
+memcached.c:        if (c->hdrbuf) {
+memcached.c:            new_hdrbuf = realloc(c->hdrbuf, c->msgused * 2 * UDP_HEADER_SIZE);
+memcached.c:            new_hdrbuf = malloc(c->msgused * 2 * UDP_HEADER_SIZE);
+memcached.c:            return -1;
+memcached.c:        c->hdrbuf = (unsigned char *)new_hdrbuf;
+memcached.c:        c->hdrsize = c->msgused * 2;
+memcached.c:    hdr = c->hdrbuf;
+memcached.c:    for (i = 0; i < c->msgused; i++) {
+memcached.c:        c->msglist[i].msg_iov[0].iov_base = (void*)hdr;
+memcached.c:        c->msglist[i].msg_iov[0].iov_len = UDP_HEADER_SIZE;
+memcached.c:        *hdr++ = c->request_id / 256;
+memcached.c:        *hdr++ = c->request_id % 256;
+memcached.c:        *hdr++ = c->msgused / 256;
+memcached.c:        *hdr++ = c->msgused % 256;
+memcached.c:        assert((void *) hdr == (caddr_t)c->msglist[i].msg_iov[0].iov_base + UDP_HEADER_SIZE);
+memcached.c:    if (c->noreply) {
+memcached.c:            fprintf(stderr, ">%d NOREPLY %s\n", c->sfd, str);
+memcached.c:        c->noreply = false;
+memcached.c:        fprintf(stderr, ">%d %s\n", c->sfd, str);
+memcached.c:    c->msgcurr = 0;
+memcached.c:    c->msgused = 0;
+memcached.c:    c->iovused = 0;
+memcached.c:    if ((len + 2) > c->wsize) {
+memcached.c:    memcpy(c->wbuf, str, len);
+memcached.c:    memcpy(c->wbuf + len, "\r\n", 2);
+memcached.c:    c->wbytes = len + 2;
+memcached.c:    c->wcurr = c->wbuf;
+memcached.c:    c->write_and_go = conn_new_cmd;
+memcached.c: * Outputs a protocol-specific "out of memory" error. For ASCII clients,
+memcached.c:    const static int error_prefix_len = sizeof(error_prefix) - 1;
+memcached.c:    if (c->protocol == binary_prot) {
+memcached.c: * has been stored in c->cmd, and the item is ready in c->item.
+memcached.c:    item *it = c->item;
+memcached.c:    int comm = c->cmd;
+memcached.c:    pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:    c->thread->stats.slab_stats[ITEM_clsid(it)].set_cmds++;
+memcached.c:    pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:    if ((it->it_flags & ITEM_CHUNKED) == 0) {
+memcached.c:        if (strncmp(ITEM_data(it) + it->nbytes - 2, "\r\n", 2) == 0) {
+memcached.c:        item_chunk *ch = (item_chunk *) c->ritem;
+memcached.c:        assert(ch->used != 0);
+memcached.c:        if (ch->used > 1) {
+memcached.c:            buf[0] = ch->data[ch->used - 2];
+memcached.c:            buf[1] = ch->data[ch->used - 1];
+memcached.c:            assert(ch->prev);
+memcached.c:            assert(ch->used == 1);
+memcached.c:            buf[0] = ch->prev->data[ch->prev->used - 1];
+memcached.c:            buf[1] = ch->data[ch->used - 1];
+memcached.c:      switch (c->cmd) {
+memcached.c:          MEMCACHED_COMMAND_ADD(c->sfd, ITEM_key(it), it->nkey,
+memcached.c:                                (ret == 1) ? it->nbytes : -1, cas);
+memcached.c:          MEMCACHED_COMMAND_REPLACE(c->sfd, ITEM_key(it), it->nkey,
+memcached.c:                                    (ret == 1) ? it->nbytes : -1, cas);
+memcached.c:          MEMCACHED_COMMAND_APPEND(c->sfd, ITEM_key(it), it->nkey,
+memcached.c:                                   (ret == 1) ? it->nbytes : -1, cas);
+memcached.c:          MEMCACHED_COMMAND_PREPEND(c->sfd, ITEM_key(it), it->nkey,
+memcached.c:                                    (ret == 1) ? it->nbytes : -1, cas);
+memcached.c:          MEMCACHED_COMMAND_SET(c->sfd, ITEM_key(it), it->nkey,
+memcached.c:                                (ret == 1) ? it->nbytes : -1, cas);
+memcached.c:          MEMCACHED_COMMAND_CAS(c->sfd, ITEM_key(it), it->nkey, it->nbytes,
+memcached.c:    item_remove(c->item);       /* release the c->item reference */
+memcached.c:    c->item = 0;
+memcached.c:    char *ret = c->rcurr;
+memcached.c:    ret -= (sizeof(c->binary_header) + c->binary_header.request.keylen +
+memcached.c:            c->binary_header.request.extlen);
+memcached.c:    assert(ret >= c->rbuf);
+memcached.c:    return c->rcurr - (c->binary_header.request.keylen);
+memcached.c:    c->msgcurr = 0;
+memcached.c:    c->msgused = 0;
+memcached.c:    c->iovused = 0;
+memcached.c:    header = (protocol_binary_response_header *)c->wbuf;
+memcached.c:    header->response.magic = (uint8_t)PROTOCOL_BINARY_RES;
+memcached.c:    header->response.opcode = c->binary_header.request.opcode;
+memcached.c:    header->response.keylen = (uint16_t)htons(key_len);
+memcached.c:    header->response.extlen = (uint8_t)hdr_len;
+memcached.c:    header->response.datatype = (uint8_t)PROTOCOL_BINARY_RAW_BYTES;
+memcached.c:    header->response.status = (uint16_t)htons(err);
+memcached.c:    header->response.bodylen = htonl(body_len);
+memcached.c:    header->response.opaque = c->opaque;
+memcached.c:    header->response.cas = htonll(c->cas);
+memcached.c:        fprintf(stderr, ">%d Writing bin response:", c->sfd);
+memcached.c:        for (ii = 0; ii < sizeof(header->bytes); ++ii) {
+memcached.c:                fprintf(stderr, "\n>%d  ", c->sfd);
+memcached.c:            fprintf(stderr, " 0x%02x", header->bytes[ii]);
+memcached.c:    add_iov(c, c->wbuf, sizeof(header->response));
+memcached.c:            errstr = "Non-numeric server-side value for incr or decr";
+memcached.c:            fprintf(stderr, ">%d UNHANDLED ERROR: %d\n", c->sfd, err);
+memcached.c:        fprintf(stderr, ">%d Writing an error: %s\n", c->sfd, errstr);
+memcached.c:        c->sbytes = swallow;
+memcached.c:        c->write_and_go = conn_swallow;
+memcached.c:        c->write_and_go = conn_new_cmd;
+memcached.c:    if (!c->noreply || c->cmd == PROTOCOL_BINARY_CMD_GET ||
+memcached.c:        c->cmd == PROTOCOL_BINARY_CMD_GETK) {
+memcached.c:        c->write_and_go = conn_new_cmd;
+memcached.c:    protocol_binary_response_incr* rsp = (protocol_binary_response_incr*)c->wbuf;
+memcached.c:    assert(c->wsize >= sizeof(*rsp));
+memcached.c:    req->message.body.delta = ntohll(req->message.body.delta);
+memcached.c:    req->message.body.initial = ntohll(req->message.body.initial);
+memcached.c:    req->message.body.expiration = ntohl(req->message.body.expiration);
+memcached.c:    nkey = c->binary_header.request.keylen;
+memcached.c:                (long long)req->message.body.delta,
+memcached.c:                (long long)req->message.body.initial,
+memcached.c:                req->message.body.expiration);
+memcached.c:    if (c->binary_header.request.cas != 0) {
+memcached.c:        cas = c->binary_header.request.cas;
+memcached.c:    switch(add_delta(c, key, nkey, c->cmd == PROTOCOL_BINARY_CMD_INCREMENT,
+memcached.c:                     req->message.body.delta, tmpbuf,
+memcached.c:        rsp->message.body.value = htonll(strtoull(tmpbuf, NULL, 10));
+memcached.c:            c->cas = cas;
+memcached.c:        write_bin_response(c, &rsp->message.body, 0, 0,
+memcached.c:                           sizeof(rsp->message.body.value));
+memcached.c:        if (req->message.body.expiration != 0xffffffff) {
+memcached.c:            rsp->message.body.value = htonll(req->message.body.initial);
+memcached.c:                (unsigned long long)req->message.body.initial);
+memcached.c:            it = item_alloc(key, nkey, 0, realtime(req->message.body.expiration),
+memcached.c:                    c->cas = ITEM_get_cas(it);
+memcached.c:                    write_bin_response(c, &rsp->message.body, 0, 0, sizeof(rsp->message.body.value));
+memcached.c:            pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:            if (c->cmd == PROTOCOL_BINARY_CMD_INCREMENT) {
+memcached.c:                c->thread->stats.incr_misses++;
+memcached.c:                c->thread->stats.decr_misses++;
+memcached.c:            pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:    item *it = c->item;
+memcached.c:    pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:    c->thread->stats.slab_stats[ITEM_clsid(it)].set_cmds++;
+memcached.c:    pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:    if ((it->it_flags & ITEM_CHUNKED) == 0) {
+memcached.c:        *(ITEM_data(it) + it->nbytes - 2) = '\r';
+memcached.c:        *(ITEM_data(it) + it->nbytes - 1) = '\n';
+memcached.c:        assert(c->ritem);
+memcached.c:        item_chunk *ch = (item_chunk *) c->ritem;
+memcached.c:        if (ch->size == ch->used)
+memcached.c:            ch = ch->next;
+memcached.c:        assert(ch->size - ch->used >= 2);
+memcached.c:        ch->data[ch->used] = '\r';
+memcached.c:        ch->data[ch->used + 1] = '\n';
+memcached.c:        ch->used += 2;
+memcached.c:    ret = store_item(it, c->cmd, c);
+memcached.c:    switch (c->cmd) {
+memcached.c:        MEMCACHED_COMMAND_ADD(c->sfd, ITEM_key(it), it->nkey,
+memcached.c:                              (ret == STORED) ? it->nbytes : -1, cas);
+memcached.c:        MEMCACHED_COMMAND_REPLACE(c->sfd, ITEM_key(it), it->nkey,
+memcached.c:                                  (ret == STORED) ? it->nbytes : -1, cas);
+memcached.c:        MEMCACHED_COMMAND_APPEND(c->sfd, ITEM_key(it), it->nkey,
+memcached.c:                                 (ret == STORED) ? it->nbytes : -1, cas);
+memcached.c:        MEMCACHED_COMMAND_PREPEND(c->sfd, ITEM_key(it), it->nkey,
+memcached.c:                                 (ret == STORED) ? it->nbytes : -1, cas);
+memcached.c:        MEMCACHED_COMMAND_SET(c->sfd, ITEM_key(it), it->nkey,
+memcached.c:                              (ret == STORED) ? it->nbytes : -1, cas);
+memcached.c:        if (c->cmd == NREAD_ADD) {
+memcached.c:        } else if(c->cmd == NREAD_REPLACE) {
+memcached.c:    item_remove(c->item);       /* release the c->item reference */
+memcached.c:    c->item = 0;
+memcached.c:        char *ofs = c->wbuf + sizeof(protocol_binary_response_header);
+memcached.c:        c->write_and_go = conn_new_cmd;
+memcached.c:    protocol_binary_response_get* rsp = (protocol_binary_response_get*)c->wbuf;
+memcached.c:    size_t nkey = c->binary_header.request.keylen;
+memcached.c:    int should_touch = (c->cmd == PROTOCOL_BINARY_CMD_TOUCH ||
+memcached.c:                        c->cmd == PROTOCOL_BINARY_CMD_GAT ||
+memcached.c:                        c->cmd == PROTOCOL_BINARY_CMD_GATK);
+memcached.c:    int should_return_key = (c->cmd == PROTOCOL_BINARY_CMD_GETK ||
+memcached.c:                             c->cmd == PROTOCOL_BINARY_CMD_GATK);
+memcached.c:    int should_return_value = (c->cmd != PROTOCOL_BINARY_CMD_TOUCH);
+memcached.c:        fprintf(stderr, "<%d %s ", c->sfd, should_touch ? "TOUCH" : "GET");
+memcached.c:        time_t exptime = ntohl(t->message.body.expiration);
+memcached.c:        uint32_t bodylen = sizeof(rsp->message.body) + (it->nbytes - 2);
+memcached.c:        pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:            c->thread->stats.touch_cmds++;
+memcached.c:            c->thread->stats.slab_stats[ITEM_clsid(it)].touch_hits++;
+memcached.c:            c->thread->stats.get_cmds++;
+memcached.c:            c->thread->stats.lru_hits[it->slabs_clsid]++;
+memcached.c:        pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:            MEMCACHED_COMMAND_TOUCH(c->sfd, ITEM_key(it), it->nkey,
+memcached.c:                                    it->nbytes, ITEM_get_cas(it));
+memcached.c:            MEMCACHED_COMMAND_GET(c->sfd, ITEM_key(it), it->nkey,
+memcached.c:                                  it->nbytes, ITEM_get_cas(it));
+memcached.c:        if (c->cmd == PROTOCOL_BINARY_CMD_TOUCH) {
+memcached.c:            bodylen -= it->nbytes - 2;
+memcached.c:        add_bin_header(c, 0, sizeof(rsp->message.body), keylen, bodylen);
+memcached.c:        rsp->message.header.response.cas = htonll(ITEM_get_cas(it));
+memcached.c:            rsp->message.body.flags = htonl(strtoul(ITEM_suffix(it), NULL, 10));
+memcached.c:        } else if (it->nsuffix > 0) {
+memcached.c:            rsp->message.body.flags = htonl(*((uint32_t *)ITEM_suffix(it)));
+memcached.c:            rsp->message.body.flags = 0;
+memcached.c:        add_iov(c, &rsp->message.body, sizeof(rsp->message.body));
+memcached.c:            if (it->it_flags & ITEM_HDR) {
+memcached.c:                int iovst = c->iovused - 3;
+memcached.c:                    iovst = c->iovused - 2;
+memcached.c:            } else if ((it->it_flags & ITEM_CHUNKED) == 0) {
+memcached.c:                add_iov(c, ITEM_data(it), it->nbytes - 2);
+memcached.c:                add_chunked_item_iovs(c, it, it->nbytes - 2);
+memcached.c:            if ((it->it_flags & ITEM_CHUNKED) == 0) {
+memcached.c:                add_iov(c, ITEM_data(it), it->nbytes - 2);
+memcached.c:                add_chunked_item_iovs(c, it, it->nbytes - 2);
+memcached.c:            c->write_and_go = conn_new_cmd;
+memcached.c:            if ((it->it_flags & ITEM_HDR) != 0 && should_return_value) {
+memcached.c:                c->item = NULL;
+memcached.c:                c->item = it;
+memcached.c:            c->item = it;
+memcached.c:        pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:            c->thread->stats.touch_cmds++;
+memcached.c:            c->thread->stats.touch_misses++;
+memcached.c:            c->thread->stats.get_cmds++;
+memcached.c:            c->thread->stats.get_misses++;
+memcached.c:        pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:            MEMCACHED_COMMAND_TOUCH(c->sfd, key, nkey, -1, 0);
+memcached.c:            MEMCACHED_COMMAND_GET(c->sfd, key, nkey, -1, 0);
+memcached.c:        if (c->noreply) {
+memcached.c:    char *buf = c->stats.buffer + c->stats.offset;
+memcached.c:        .response.opaque = c->opaque
+memcached.c:    c->stats.offset += sizeof(header.response) + bodylen;
+memcached.c:    char *pos = c->stats.buffer + c->stats.offset;
+memcached.c:    int remaining = c->stats.size - c->stats.offset;
+memcached.c:    int room = remaining - 1;
+memcached.c:    c->stats.offset += nbytes;
+memcached.c:    size_t nsize = c->stats.size;
+memcached.c:    size_t available = nsize - c->stats.offset;
+memcached.c:    /* Special case: No buffer -- need to allocate fresh */
+memcached.c:    if (c->stats.buffer == NULL) {
+memcached.c:        available = c->stats.size = c->stats.offset = 0;
+memcached.c:        available = nsize - c->stats.offset;
+memcached.c:    if (nsize != c->stats.size) {
+memcached.c:        char *ptr = realloc(c->stats.buffer, nsize);
+memcached.c:            c->stats.buffer = ptr;
+memcached.c:            c->stats.size = nsize;
+memcached.c:    if (c->protocol == binary_prot) {
+memcached.c:    assert(c->stats.offset <= c->stats.size);
+memcached.c:    size_t nkey = c->binary_header.request.keylen;
+memcached.c:        fprintf(stderr, "<%d STATS ", c->sfd);
+memcached.c:            if (c->stats.buffer == NULL) {
+memcached.c:                write_and_free(c, c->stats.buffer, c->stats.offset);
+memcached.c:                c->stats.buffer = NULL;
+memcached.c:    if (c->stats.buffer == NULL) {
+memcached.c:        write_and_free(c, c->stats.buffer, c->stats.offset);
+memcached.c:        c->stats.buffer = NULL;
+memcached.c:    c->substate = next_substate;
+memcached.c:    c->rlbytes = c->keylen + extra;
+memcached.c:    ptrdiff_t offset = c->rcurr + sizeof(protocol_binary_request_header) - c->rbuf;
+memcached.c:    if (c->rlbytes > c->rsize - offset) {
+memcached.c:        size_t nsize = c->rsize;
+memcached.c:        size_t size = c->rlbytes + sizeof(protocol_binary_request_header);
+memcached.c:        if (nsize != c->rsize) {
+memcached.c:                        c->sfd, (unsigned long)c->rsize, (unsigned long)nsize);
+memcached.c:            char *newm = realloc(c->rbuf, nsize);
+memcached.c:                            c->sfd);
+memcached.c:            c->rbuf= newm;
+memcached.c:            c->rcurr = c->rbuf + offset - sizeof(protocol_binary_request_header);
+memcached.c:            c->rsize = nsize;
+memcached.c:        if (c->rbuf != c->rcurr) {
+memcached.c:            memmove(c->rbuf, c->rcurr, c->rbytes);
+memcached.c:            c->rcurr = c->rbuf;
+memcached.c:                fprintf(stderr, "%d: Repack input buffer\n", c->sfd);
+memcached.c:    c->ritem = c->rcurr + sizeof(protocol_binary_request_header);
+memcached.c:                c->binary_header.request.opcode, c->sfd);
+memcached.c:    c->write_and_go = conn_closing;
+memcached.c:    c->authenticated = false;
+memcached.c:    if (!c->sasl_conn) {
+memcached.c:                                   NULL, 0, &c->sasl_conn);
+memcached.c:            c->sasl_conn = NULL;
+memcached.c:                        c->binary_header.request.bodylen
+memcached.c:                        - c->binary_header.request.keylen);
+memcached.c:    int result=sasl_listmech(c->sasl_conn, NULL,
+memcached.c:                        c->binary_header.request.bodylen
+memcached.c:                        - c->binary_header.request.keylen);
+memcached.c:    assert(c->binary_header.request.extlen == 0);
+memcached.c:    int nkey = c->binary_header.request.keylen;
+memcached.c:    int vlen = c->binary_header.request.bodylen - nkey;
+memcached.c:        c->write_and_go = conn_swallow;
+memcached.c:    if (it == 0 || (it->it_flags & ITEM_CHUNKED)) {
+memcached.c:        c->write_and_go = conn_swallow;
+memcached.c:    c->item = it;
+memcached.c:    c->ritem = ITEM_data(it);
+memcached.c:    c->rlbytes = vlen;
+memcached.c:    c->substate = bin_reading_sasl_auth_data;
+memcached.c:    assert(c->item);
+memcached.c:    int nkey = c->binary_header.request.keylen;
+memcached.c:    int vlen = c->binary_header.request.bodylen - nkey;
+memcached.c:    if (nkey > ((item*) c->item)->nkey) {
+memcached.c:        c->write_and_go = conn_swallow;
+memcached.c:        item_unlink(c->item);
+memcached.c:    memcpy(mech, ITEM_key((item*)c->item), nkey);
+memcached.c:    const char *challenge = vlen == 0 ? NULL : ITEM_data((item*) c->item);
+memcached.c:    if (vlen > ((item*) c->item)->nbytes) {
+memcached.c:        c->write_and_go = conn_swallow;
+memcached.c:        item_unlink(c->item);
+memcached.c:    int result=-1;
+memcached.c:    switch (c->cmd) {
+memcached.c:        result = sasl_server_start(c->sasl_conn, mech,
+memcached.c:        result = sasl_server_step(c->sasl_conn,
+memcached.c:                    c->cmd, challenge);
+memcached.c:    item_unlink(c->item);
+memcached.c:        c->authenticated = true;
+memcached.c:        pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:        c->thread->stats.auth_cmds++;
+memcached.c:        pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:        c->write_and_go = conn_new_cmd;
+memcached.c:        pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:        c->thread->stats.auth_cmds++;
+memcached.c:        c->thread->stats.auth_errors++;
+memcached.c:        pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:    switch (c->cmd) {
+memcached.c:        rv = c->authenticated;
+memcached.c:                c->cmd, rv ? "true" : "false");
+memcached.c:    uint8_t extlen = c->binary_header.request.extlen;
+memcached.c:    uint16_t keylen = c->binary_header.request.keylen;
+memcached.c:    uint32_t bodylen = c->binary_header.request.bodylen;
+memcached.c:        c->write_and_go = conn_closing;
+memcached.c:        c->write_and_go = conn_closing;
+memcached.c:    MEMCACHED_PROCESS_COMMAND_START(c->sfd, c->rcurr, c->rbytes);
+memcached.c:    c->noreply = true;
+memcached.c:    switch (c->cmd) {
+memcached.c:        c->cmd = PROTOCOL_BINARY_CMD_SET;
+memcached.c:        c->cmd = PROTOCOL_BINARY_CMD_ADD;
+memcached.c:        c->cmd = PROTOCOL_BINARY_CMD_REPLACE;
+memcached.c:        c->cmd = PROTOCOL_BINARY_CMD_DELETE;
+memcached.c:        c->cmd = PROTOCOL_BINARY_CMD_INCREMENT;
+memcached.c:        c->cmd = PROTOCOL_BINARY_CMD_DECREMENT;
+memcached.c:        c->cmd = PROTOCOL_BINARY_CMD_QUIT;
+memcached.c:        c->cmd = PROTOCOL_BINARY_CMD_FLUSH;
+memcached.c:        c->cmd = PROTOCOL_BINARY_CMD_APPEND;
+memcached.c:        c->cmd = PROTOCOL_BINARY_CMD_PREPEND;
+memcached.c:        c->cmd = PROTOCOL_BINARY_CMD_GET;
+memcached.c:        c->cmd = PROTOCOL_BINARY_CMD_GETK;
+memcached.c:        c->cmd = PROTOCOL_BINARY_CMD_GAT;
+memcached.c:        c->cmd = PROTOCOL_BINARY_CMD_GATK;
+memcached.c:        c->noreply = false;
+memcached.c:    switch (c->cmd) {
+memcached.c:                c->write_and_go = conn_closing;
+memcached.c:                if (c->noreply) {
+memcached.c:    nkey = c->binary_header.request.keylen;
+memcached.c:    req->message.body.flags = ntohl(req->message.body.flags);
+memcached.c:    req->message.body.expiration = ntohl(req->message.body.expiration);
+memcached.c:    vlen = c->binary_header.request.bodylen - (nkey + c->binary_header.request.extlen);
+memcached.c:        if (c->cmd == PROTOCOL_BINARY_CMD_ADD) {
+memcached.c:            fprintf(stderr, "<%d ADD ", c->sfd);
+memcached.c:        } else if (c->cmd == PROTOCOL_BINARY_CMD_SET) {
+memcached.c:            fprintf(stderr, "<%d SET ", c->sfd);
+memcached.c:            fprintf(stderr, "<%d REPLACE ", c->sfd);
+memcached.c:    it = item_alloc(key, nkey, req->message.body.flags,
+memcached.c:            realtime(req->message.body.expiration), vlen+2);
+memcached.c:        if (! item_size_ok(nkey, req->message.body.flags, vlen + 2)) {
+memcached.c:            c->sbytes = vlen;
+memcached.c:        /* FIXME: losing c->cmd since it's translated below. refactor? */
+memcached.c:        LOGGER_LOG(c->thread->l, LOG_MUTATIONS, LOGGER_ITEM_STORE,
+memcached.c:                NULL, status, 0, key, nkey, req->message.body.expiration,
+memcached.c:        if (c->cmd == PROTOCOL_BINARY_CMD_SET) {
+memcached.c:                STORAGE_delete(c->thread->storage, it);
+memcached.c:        c->write_and_go = conn_swallow;
+memcached.c:    ITEM_set_cas(it, c->binary_header.request.cas);
+memcached.c:    switch (c->cmd) {
+memcached.c:            c->cmd = NREAD_ADD;
+memcached.c:            c->cmd = NREAD_SET;
+memcached.c:            c->cmd = NREAD_REPLACE;
+memcached.c:        c->cmd = NREAD_CAS;
+memcached.c:    c->item = it;
+memcached.c:    c->ritem = ITEM_data(it);
+memcached.c:    c->rlbytes = vlen;
+memcached.c:    c->substate = bin_read_set_value;
+memcached.c:    nkey = c->binary_header.request.keylen;
+memcached.c:    vlen = c->binary_header.request.bodylen - nkey;
+memcached.c:            c->sbytes = vlen;
+memcached.c:        c->write_and_go = conn_swallow;
+memcached.c:    ITEM_set_cas(it, c->binary_header.request.cas);
+memcached.c:    switch (c->cmd) {
+memcached.c:            c->cmd = NREAD_APPEND;
+memcached.c:            c->cmd = NREAD_PREPEND;
+memcached.c:    c->item = it;
+memcached.c:    c->ritem = ITEM_data(it);
+memcached.c:    c->rlbytes = vlen;
+memcached.c:    c->substate = bin_read_set_value;
+memcached.c:    if (c->binary_header.request.extlen == sizeof(req->message.body)) {
+memcached.c:        exptime = ntohl(req->message.body.expiration);
+memcached.c:        settings.oldest_live = new_oldest - 1;
+memcached.c:    pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:    c->thread->stats.flush_cmds++;
+memcached.c:    pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:    size_t nkey = c->binary_header.request.keylen;
+memcached.c:        uint64_t cas = ntohll(req->message.header.request.cas);
+memcached.c:            MEMCACHED_COMMAND_DELETE(c->sfd, ITEM_key(it), it->nkey);
+memcached.c:            pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:            c->thread->stats.slab_stats[ITEM_clsid(it)].delete_hits++;
+memcached.c:            pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:            STORAGE_delete(c->thread->storage, it);
+memcached.c:        pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:        c->thread->stats.delete_misses++;
+memcached.c:        pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:    assert(c->cmd >= 0);
+memcached.c:    switch(c->substate) {
+memcached.c:        if (c->cmd == PROTOCOL_BINARY_CMD_APPEND ||
+memcached.c:                c->cmd == PROTOCOL_BINARY_CMD_PREPEND) {
+memcached.c:        fprintf(stderr, "Not handling substate %d\n", c->substate);
+memcached.c:    c->cmd = -1;
+memcached.c:    c->substate = bin_no_state;
+memcached.c:    if(c->item != NULL) {
+memcached.c:        item_remove(c->item);
+memcached.c:        c->item = NULL;
+memcached.c:    if (c->rbytes > 0) {
+memcached.c:    assert(c->protocol == ascii_prot
+memcached.c:           || c->protocol == binary_prot);
+memcached.c:    if (c->protocol == ascii_prot) {
+memcached.c:    } else if (c->protocol == binary_prot) {
+memcached.c:    while (dch->size == dch->used) {
+memcached.c:        if (dch->next) {
+memcached.c:            dch = dch->next;
+memcached.c:    if (s_it->it_flags & ITEM_CHUNKED) {
+memcached.c:            assert(dch->used <= dch->size);
+memcached.c:            int todo = (dch->size - dch->used < sch->used - copied)
+memcached.c:                ? dch->size - dch->used : sch->used - copied;
+memcached.c:            memcpy(dch->data + dch->used, sch->data + copied, todo);
+memcached.c:            dch->used += todo;
+memcached.c:            remain -= todo;
+memcached.c:            assert(dch->used <= dch->size);
+memcached.c:            if (dch->size == dch->used) {
+memcached.c:                    return -1;
+memcached.c:            assert(copied <= sch->used);
+memcached.c:            if (copied == sch->used) {
+memcached.c:                sch = sch->next;
+memcached.c:        /* Fill dch's via a non-chunked item. */
+memcached.c:            int todo = (dch->size - dch->used < len - done)
+memcached.c:                ? dch->size - dch->used : len - done;
+memcached.c:            //assert(dch->size - dch->used != 0);
+memcached.c:            memcpy(dch->data + dch->used, ITEM_data(s_it) + done, todo);
+memcached.c:            dch->used += todo;
+memcached.c:            assert(dch->used <= dch->size);
+memcached.c:            if (dch->size == dch->used) {
+memcached.c:                item_chunk *tch = do_item_alloc_chunk(dch, len - done);
+memcached.c:                    return -1;
+memcached.c:        if (new_it->it_flags & ITEM_CHUNKED) {
+memcached.c:            if (_store_item_copy_chunks(new_it, old_it, old_it->nbytes - 2) == -1 ||
+memcached.c:                _store_item_copy_chunks(new_it, add_it, add_it->nbytes) == -1) {
+memcached.c:                return -1;
+memcached.c:            memcpy(ITEM_data(new_it), ITEM_data(old_it), old_it->nbytes);
+memcached.c:            memcpy(ITEM_data(new_it) + old_it->nbytes - 2 /* CRLF */, ITEM_data(add_it), add_it->nbytes);
+memcached.c:        if (new_it->it_flags & ITEM_CHUNKED) {
+memcached.c:            if (_store_item_copy_chunks(new_it, add_it, add_it->nbytes - 2) == -1 ||
+memcached.c:                _store_item_copy_chunks(new_it, old_it, old_it->nbytes) == -1) {
+memcached.c:                return -1;
+memcached.c:            memcpy(ITEM_data(new_it), ITEM_data(add_it), add_it->nbytes);
+memcached.c:            memcpy(ITEM_data(new_it) + add_it->nbytes - 2 /* CRLF */, ITEM_data(old_it), old_it->nbytes);
+memcached.c:    item *old_it = do_item_get(key, it->nkey, hv, c, DONT_UPDATE);
+memcached.c:            pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:            c->thread->stats.cas_misses++;
+memcached.c:            pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:            pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:            c->thread->stats.slab_stats[ITEM_clsid(old_it)].cas_hits++;
+memcached.c:            pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:            STORAGE_delete(c->thread->storage, old_it);
+memcached.c:            pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:            c->thread->stats.slab_stats[ITEM_clsid(old_it)].cas_badval++;
+memcached.c:            pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:         * Append - combine new and old record into single one. Here it's
+memcached.c:         * atomic and thread-safe.
+memcached.c:            if ((old_it->it_flags & ITEM_HDR) != 0) {
+memcached.c:                /* block append/prepend from working with extstore-d items.
+memcached.c:                /* we have it and old_it here - alloc memory to hold both */
+memcached.c:                /* flags was already lost - so recover them from ITEM_suffix(it) */
+memcached.c:                } else if (old_it->nsuffix > 0) {
+memcached.c:                new_it = do_item_alloc(key, it->nkey, flags, old_it->exptime, it->nbytes + old_it->nbytes - 2 /* CRLF */);
+memcached.c:                if (new_it == NULL || _store_item_copy_data(comm, old_it, new_it, it) == -1) {
+memcached.c:                STORAGE_delete(c->thread->storage, old_it);
+memcached.c:            c->cas = ITEM_get_cas(it);
+memcached.c:        c->cas = ITEM_get_cas(it);
+memcached.c:    LOGGER_LOG(c->thread->l, LOG_MUTATIONS, LOGGER_ITEM_STORE, NULL,
+memcached.c:            stored, comm, ITEM_key(it), it->nkey, it->exptime, ITEM_clsid(it));
+memcached.c: *      ncommand = tokens[ix].value - command;
+memcached.c:                tokens[ntokens].length = e - s;
+memcached.c:                if (ntokens == max_tokens - 1) {
+memcached.c:        tokens[ntokens].length = e - s;
+memcached.c:        c->write_and_free = buf;
+memcached.c:        c->wcurr = buf;
+memcached.c:        c->wbytes = bytes;
+memcached.c:        c->write_and_go = conn_new_cmd;
+memcached.c:    int noreply_index = ntokens - 2;
+memcached.c:        c->noreply = true;
+memcached.c:    return c->noreply;
+memcached.c:    vlen = vsnprintf(val_str, sizeof(val_str) - 1, fmt, ap);
+memcached.c:    APPEND_STAT("uptime", "%u", now - ITEM_UPDATE_INTERVAL);
+memcached.c:    APPEND_STAT("curr_connections", "%llu", (unsigned long long)stats_state.curr_conns - 1);
+memcached.c:    if (c->thread->storage) {
+memcached.c:    if (c->thread->storage) {
+memcached.c:        extstore_get_stats(c->thread->storage, &st);
+memcached.c:    } else if (c->state == conn_closed) {
+memcached.c:        struct sockaddr *addr = (void *)&c->request_addr;
+memcached.c:        if (c->state == conn_listening ||
+memcached.c:                (IS_UDP(c->transport) &&
+memcached.c:                 c->state == conn_read)) {
+memcached.c:            if (getsockname(c->sfd,
+memcached.c:        af = addr->sa_family;
+memcached.c:                        &((struct sockaddr_in *)addr)->sin_addr,
+memcached.c:                        sizeof(addr_text) - 1);
+memcached.c:                port = ntohs(((struct sockaddr_in *)addr)->sin_port);
+memcached.c:                protoname = IS_UDP(c->transport) ? "udp" : "tcp";
+memcached.c:                        &((struct sockaddr_in6 *)addr)->sin6_addr,
+memcached.c:                        sizeof(addr_text) - 2)) {
+memcached.c:                port = ntohs(((struct sockaddr_in6 *)addr)->sin6_port);
+memcached.c:                protoname = IS_UDP(c->transport) ? "udp6" : "tcp6";
+memcached.c:                        ((struct sockaddr_un *)addr)->sun_path,
+memcached.c:                        sizeof(addr_text) - 1);
+memcached.c:                addr_text[sizeof(addr_text)-1] = '\0';
+memcached.c:            /* Most likely this is a connected UNIX-domain client which
+memcached.c:             * output -- not worth the complexity of the locking that'd be
+memcached.c:            if (conns[i]->state != conn_closed) {
+memcached.c:                        state_text(conns[i]->state));
+memcached.c:                        current_time - conns[i]->last_cmd_time);
+memcached.c:    void *storage = c->thread->storage;
+memcached.c:	while( (read= getline(&in,&len,fd))!=-1 ){
+memcached.c:			pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:                        c->thread->stats.get_misses++;
+memcached.c:                        c->thread->stats.get_cmds++;
+memcached.c:                        pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:                        MEMCACHED_COMMAND_GET(c->sfd, key,keysize, -1, 0);
+memcached.c:                                memmove(ITEM_data(it), val, it->nbytes);
+memcached.c:                                        fprintf(fo, "ERROR ----\n");
+memcached.c:        	t2 = clock() - t1;
+memcached.c:            if (c->stats.buffer == NULL) {
+memcached.c:                write_and_free(c, c->stats.buffer, c->stats.offset);
+memcached.c:                c->stats.buffer = NULL;
+memcached.c:    if (c->stats.buffer == NULL) {
+memcached.c:        write_and_free(c, c->stats.buffer, c->stats.offset);
+memcached.c:        c->stats.buffer = NULL;
+memcached.c:        if (it->nsuffix == 0) {
+memcached.c:        p = itoa_u32(nbytes-2, p+1);
+memcached.c:    return (p - suffix) + 2;
+memcached.c:    if (it && it->refcount > IT_REFCOUNT_LIMIT) {
+memcached.c:    if (i >= c->isize) {
+memcached.c:        item **new_list = realloc(c->ilist, sizeof(item *) * c->isize * 2);
+memcached.c:            c->isize *= 2;
+memcached.c:            c->ilist = new_list;
+memcached.c:            return -1;
+memcached.c:    /* Goofy mid-flight realloc. */
+memcached.c:    if (i >= c->suffixsize) {
+memcached.c:    char **new_suffix_list = realloc(c->suffixlist,
+memcached.c:                           sizeof(char *) * c->suffixsize * 2);
+memcached.c:        c->suffixsize *= 2;
+memcached.c:        c->suffixlist  = new_suffix_list;
+memcached.c:    suffix = do_cache_alloc(c->thread->suffix_cache);
+memcached.c:    *(c->suffixlist + i) = suffix;
+memcached.c:    io_wrap *wrap = (io_wrap *)io->data;
+memcached.c:    conn *c = wrap->c;
+memcached.c:    assert(wrap->active == true);
+memcached.c:    item *read_it = (item *)io->buf;
+memcached.c:        uint32_t crc = (uint32_t) read_it->exptime;
+memcached.c:        if (io->iov != NULL) {
+memcached.c:            crc2 = crc32c(0, (char *)io->iov[0].iov_base+32, io->iov[0].iov_len-32);
+memcached.c:            io->iov[0].iov_len = 0;
+memcached.c:            for (x = 1; x < io->iovcnt; x++) {
+memcached.c:                crc2 = crc32c(crc2, (char *)io->iov[x].iov_base, io->iov[x].iov_len);
+memcached.c:            crc2 = crc32c(0, (char *)read_it+32, io->len-32);
+memcached.c:            wrap->badcrc = true;
+memcached.c:        if (c->protocol == binary_prot) {
+memcached.c:                (protocol_binary_response_header *)c->wbuf;
+memcached.c:            if (header->response.keylen) {
+memcached.c:                write_bin_miss_response(c, ITEM_key(wrap->hdr_it), wrap->hdr_it->nkey);
+memcached.c:            for (i = 0; i < wrap->iovec_count; i++) {
+memcached.c:                v = &c->iov[wrap->iovec_start + i];
+memcached.c:                v->iov_len = 0;
+memcached.c:                v->iov_base = NULL;
+memcached.c:        wrap->miss = true;
+memcached.c:        assert(read_it->slabs_clsid != 0);
+memcached.c:        if (io->iov == NULL) {
+memcached.c:            c->iov[wrap->iovec_data].iov_base = ITEM_data(read_it);
+memcached.c:            if (c->protocol == binary_prot)
+memcached.c:                c->iov[wrap->iovec_data].iov_len -= 2;
+memcached.c:            if (c->protocol == binary_prot) {
+memcached.c:                if (io->iov[io->iovcnt-1].iov_len >= 2) {
+memcached.c:                    io->iov[io->iovcnt-1].iov_len -= 2;
+memcached.c:                    io->iov[io->iovcnt-1].iov_len = 0;
+memcached.c:                    io->iov[io->iovcnt-2].iov_len -= 1;
+memcached.c:    c->io_wrapleft--;
+memcached.c:    wrap->active = false;
+memcached.c:    //assert(c->io_wrapleft >= 0);
+memcached.c:    // All IO's have returned, lets re-attach this connection to our original
+memcached.c:    if (c->io_wrapleft == 0) {
+memcached.c:        assert(c->io_queued == true);
+memcached.c:        c->io_queued = false;
+memcached.c:        } else if (it->nsuffix > 0) {
+memcached.c:        new_it = item_alloc(ITEM_key(it), it->nkey, flags, it->exptime, it->nbytes);
+memcached.c:        assert(new_it == NULL || (new_it->it_flags & ITEM_CHUNKED));
+memcached.c:        return -1;
+memcached.c:    assert(!c->io_queued); // FIXME: debugging.
+memcached.c:    new_it->slabs_clsid = clsid;
+memcached.c:    io_wrap *io = do_cache_alloc(c->thread->io_cache);
+memcached.c:    io->active = true;
+memcached.c:    io->miss = false;
+memcached.c:    io->badcrc = false;
+memcached.c:    io->hdr_it = it;
+memcached.c:    io->iovec_start = iovst;
+memcached.c:    io->iovec_count = iovcnt;
+memcached.c:        size_t remain = new_it->nbytes;
+memcached.c:        io->io.iov = &c->iov[c->iovused];
+memcached.c:        add_iov(c, new_it, ITEM_ntotal(new_it) - new_it->nbytes);
+memcached.c:                do_cache_free(c->thread->io_cache, io);
+memcached.c:                return -1;
+memcached.c:            add_iov(c, chunk->data, (remain < chunk->size) ? remain : chunk->size);
+memcached.c:            chunk->used = (remain < chunk->size) ? remain : chunk->size;
+memcached.c:            remain -= chunk->size;
+memcached.c:        io->io.iovcnt = ciovcnt;
+memcached.c:        io->iovec_count += ciovcnt-1;
+memcached.c:        io->io.iov = NULL;
+memcached.c:        io->iovec_data = c->iovused;
+memcached.c:        add_iov(c, "", it->nbytes);
+memcached.c:    io->io.buf = (void *)new_it;
+memcached.c:    io->c = c;
+memcached.c:    // We need to stack the sub-struct IO's together as well.
+memcached.c:    if (c->io_wraplist) {
+memcached.c:        io->io.next = &c->io_wraplist->io;
+memcached.c:        io->io.next = NULL;
+memcached.c:    io->next = c->io_wraplist;
+memcached.c:    c->io_wraplist = io;
+memcached.c:    assert(c->io_wrapleft >= 0);
+memcached.c:    c->io_wrapleft++;
+memcached.c:    io->io.data = (void *)io;
+memcached.c:    // Now, fill in io->io based on what was in our header.
+memcached.c:    io->io.page_version = hdr->page_version;
+memcached.c:    io->io.page_id = hdr->page_id;
+memcached.c:    io->io.offset = hdr->offset;
+memcached.c:    io->io.len = ntotal;
+memcached.c:    io->io.mode = OBJ_IO_READ;
+memcached.c:    io->io.cb = _get_extstore_cb;
+memcached.c:    //fprintf(stderr, "EXTSTORE: IO stacked %u\n", io->iovec_data);
+memcached.c:    pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:    c->thread->stats.get_extstore++;
+memcached.c:    pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:        while(key_token->length != 0) {
+memcached.c:            key = key_token->value;
+memcached.c:            nkey = key_token->length;
+memcached.c:                while (i-- > 0) {
+memcached.c:                    item_remove(*(c->ilist + i));
+memcached.c:                        do_cache_free(c->thread->suffix_cache, *(c->suffixlist + i));
+memcached.c:                  MEMCACHED_COMMAND_GET(c->sfd, ITEM_key(it), it->nkey,
+memcached.c:                                        it->nbytes, ITEM_get_cas(it));
+memcached.c:                  nbytes = it->nbytes;
+memcached.c:                      add_iov(c, ITEM_key(it), it->nkey) != 0 ||
+memcached.c:                      (settings.inline_ascii_response && add_iov(c, ITEM_suffix(it), it->nsuffix - 2) != 0) ||
+memcached.c:                  if (it->it_flags & ITEM_HDR) {
+memcached.c:                      if (_get_extstore(c, it, c->iovused-3, 4) != 0) {
+memcached.c:                  } else if ((it->it_flags & ITEM_CHUNKED) == 0) {
+memcached.c:                  if ((it->it_flags & ITEM_CHUNKED) == 0) {
+memcached.c:                      add_iov(c, ITEM_data(it), it->nbytes);
+memcached.c:                  } else if (add_chunked_item_iovs(c, it, it->nbytes) != 0) {
+memcached.c:                  MEMCACHED_COMMAND_GET(c->sfd, ITEM_key(it), it->nkey,
+memcached.c:                                        it->nbytes, ITEM_get_cas(it));
+memcached.c:                      add_iov(c, ITEM_key(it), it->nkey) != 0)
+memcached.c:                  if ((it->it_flags & ITEM_CHUNKED) == 0)
+memcached.c:                          if (add_iov(c, ITEM_suffix(it), it->nsuffix + it->nbytes) != 0)
+memcached.c:                      } else if (add_iov(c, ITEM_suffix(it), it->nsuffix) != 0 ||
+memcached.c:                                 add_chunked_item_iovs(c, it, it->nbytes) != 0) {
+memcached.c:                    fprintf(stderr, ">%d sending key ", c->sfd);
+memcached.c:                    for (ii = 0; ii < it->nkey; ++ii) {
+memcached.c:                /* item_get() has incremented it->refcount for us */
+memcached.c:                pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:                    c->thread->stats.touch_cmds++;
+memcached.c:                    c->thread->stats.slab_stats[ITEM_clsid(it)].touch_hits++;
+memcached.c:                    c->thread->stats.lru_hits[it->slabs_clsid]++;
+memcached.c:                    c->thread->stats.get_cmds++;
+memcached.c:                pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:                if ((it->it_flags & ITEM_HDR) == 0) {
+memcached.c:                    *(c->ilist + i) = it;
+memcached.c:                *(c->ilist + i) = it;
+memcached.c:                pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:                    c->thread->stats.touch_cmds++;
+memcached.c:                    c->thread->stats.touch_misses++;
+memcached.c:                    c->thread->stats.get_misses++;
+memcached.c:                    c->thread->stats.get_cmds++;
+memcached.c:                MEMCACHED_COMMAND_GET(c->sfd, key, nkey, -1, 0);
+memcached.c:                pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:        if(key_token->value != NULL) {
+memcached.c:            ntokens = tokenize_command(key_token->value, tokens, MAX_TOKENS);
+memcached.c:    } while(key_token->value != NULL);
+memcached.c:    c->icurr = c->ilist;
+memcached.c:    c->ileft = i;
+memcached.c:        c->suffixcurr = c->suffixlist;
+memcached.c:        c->suffixleft = si;
+memcached.c:        fprintf(stderr, ">%d END\n", c->sfd);
+memcached.c:        If the loop was terminated because of out-of-memory, it is not
+memcached.c:    if (key_token->value != NULL || add_iov(c, "END\r\n", 5) != 0
+memcached.c:        || (IS_UDP(c->transport) && build_udp_headers(c) != 0)) {
+memcached.c:        c->msgcurr = 0;
+memcached.c:    if (vlen < 0 || vlen > (INT_MAX - 2)) {
+memcached.c:        LOGGER_LOG(c->thread->l, LOG_MUTATIONS, LOGGER_ITEM_STORE,
+memcached.c:        c->write_and_go = conn_swallow;
+memcached.c:        c->sbytes = vlen;
+memcached.c:                STORAGE_delete(c->thread->storage, it);
+memcached.c:    c->item = it;
+memcached.c:    c->ritem = ITEM_data(it);
+memcached.c:    c->rlbytes = it->nbytes;
+memcached.c:    c->cmd = comm;
+memcached.c:        pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:        c->thread->stats.touch_cmds++;
+memcached.c:        c->thread->stats.slab_stats[ITEM_clsid(it)].touch_hits++;
+memcached.c:        pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:        pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:        c->thread->stats.touch_cmds++;
+memcached.c:        c->thread->stats.touch_misses++;
+memcached.c:        pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:        out_string(c, "CLIENT_ERROR cannot increment or decrement non-numeric value");
+memcached.c:        pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:            c->thread->stats.incr_misses++;
+memcached.c:            c->thread->stats.decr_misses++;
+memcached.c:        pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:    /* Can't delta zero byte values. 2-byte are the "\r\n" */
+memcached.c:    if (it->nbytes <= 2 || (it->it_flags & (ITEM_CHUNKED|ITEM_HDR)) != 0) {
+memcached.c:    if (it->nbytes <= 2 || (it->it_flags & (ITEM_CHUNKED)) != 0) {
+memcached.c:        MEMCACHED_COMMAND_INCR(c->sfd, ITEM_key(it), it->nkey, value);
+memcached.c:            value -= delta;
+memcached.c:        MEMCACHED_COMMAND_DECR(c->sfd, ITEM_key(it), it->nkey, value);
+memcached.c:    pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:        c->thread->stats.slab_stats[ITEM_clsid(it)].incr_hits++;
+memcached.c:        c->thread->stats.slab_stats[ITEM_clsid(it)].decr_hits++;
+memcached.c:    pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:    if (res + 2 <= it->nbytes && it->refcount == 2) { /* replace in-place */
+memcached.c:        memset(ITEM_data(it) + res, ' ', it->nbytes - res - 2);
+memcached.c:    } else if (it->refcount > 1) {
+memcached.c:        } else if (it->nsuffix > 0) {
+memcached.c:        new_it = do_item_alloc(ITEM_key(it), it->nkey, flags, it->exptime, res + 2);
+memcached.c:        if (it->refcount == 1)
+memcached.c:        MEMCACHED_COMMAND_DELETE(c->sfd, ITEM_key(it), it->nkey);
+memcached.c:        pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:        c->thread->stats.slab_stats[ITEM_clsid(it)].delete_hits++;
+memcached.c:        pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:        STORAGE_delete(c->thread->storage, it);
+memcached.c:        pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:        c->thread->stats.delete_misses++;
+memcached.c:        pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:    if (i != -1) {
+memcached.c:    if (i != -1) {
+memcached.c:        for (x = COMMAND_TOKEN + 1; x < ntokens - 1; x++) {
+memcached.c:    switch(logger_add_watcher(c, c->sfd, f)) {
+memcached.c:            event_del(&c->event);
+memcached.c:        /* per-slab-class free chunk setting. */
+memcached.c:    MEMCACHED_PROCESS_COMMAND_START(c->sfd, c->rcurr, c->rbytes);
+memcached.c:        fprintf(stderr, "<%d %s\n", c->sfd, command);
+memcached.c:    c->msgcurr = 0;
+memcached.c:    c->msgused = 0;
+memcached.c:    c->iovused = 0;
+memcached.c:        pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:        c->thread->stats.flush_cmds++;
+memcached.c:        pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:        if (ntokens != (c->noreply ? 3 : 2)) {
+memcached.c:          realtime(exptime) - 1 would overflow to the max unsigned
+memcached.c:            settings.oldest_live = new_oldest - 1;
+memcached.c:                    c, c->sfd, LRU_CRAWLER_CAP_REMAINING);
+memcached.c:                    event_del(&c->event);
+memcached.c:        if (ntokens >= 2 && strncmp(tokens[ntokens - 2].value, "HTTP/", 5) == 0) {
+memcached.c:    assert(c->rcurr <= (c->rbuf + c->rsize));
+memcached.c:    assert(c->rbytes > 0);
+memcached.c:    if (c->protocol == negotiating_prot || c->transport == udp_transport)  {
+memcached.c:        if ((unsigned char)c->rbuf[0] == (unsigned char)PROTOCOL_BINARY_REQ) {
+memcached.c:            c->protocol = binary_prot;
+memcached.c:            c->protocol = ascii_prot;
+memcached.c:            fprintf(stderr, "%d: Client using the %s protocol\n", c->sfd,
+memcached.c:                    prot_text(c->protocol));
+memcached.c:    if (c->protocol == binary_prot) {
+memcached.c:        if (c->rbytes < sizeof(c->binary_header)) {
+memcached.c:            if (((long)(c->rcurr)) % 8 != 0) {
+memcached.c:                memmove(c->rbuf, c->rcurr, c->rbytes);
+memcached.c:                c->rcurr = c->rbuf;
+memcached.c:                    fprintf(stderr, "%d: Realign input buffer\n", c->sfd);
+memcached.c:            req = (protocol_binary_request_header*)c->rcurr;
+memcached.c:                fprintf(stderr, "<%d Read binary protocol data:", c->sfd);
+memcached.c:                for (ii = 0; ii < sizeof(req->bytes); ++ii) {
+memcached.c:                        fprintf(stderr, "\n<%d   ", c->sfd);
+memcached.c:                    fprintf(stderr, " 0x%02x", req->bytes[ii]);
+memcached.c:            c->binary_header = *req;
+memcached.c:            c->binary_header.request.keylen = ntohs(req->request.keylen);
+memcached.c:            c->binary_header.request.bodylen = ntohl(req->request.bodylen);
+memcached.c:            c->binary_header.request.cas = ntohll(req->request.cas);
+memcached.c:            if (c->binary_header.request.magic != PROTOCOL_BINARY_REQ) {
+memcached.c:                            c->binary_header.request.magic);
+memcached.c:                return -1;
+memcached.c:            c->msgcurr = 0;
+memcached.c:            c->msgused = 0;
+memcached.c:            c->iovused = 0;
+memcached.c:            c->cmd = c->binary_header.request.opcode;
+memcached.c:            c->keylen = c->binary_header.request.keylen;
+memcached.c:            c->opaque = c->binary_header.request.opaque;
+memcached.c:            c->cas = 0;
+memcached.c:            c->rbytes -= sizeof(c->binary_header);
+memcached.c:            c->rcurr += sizeof(c->binary_header);
+memcached.c:        if (c->rbytes == 0)
+memcached.c:        el = memchr(c->rcurr, '\n', c->rbytes);
+memcached.c:            if (c->rbytes > 1024) {
+memcached.c:                char *ptr = c->rcurr;
+memcached.c:                if (ptr - c->rcurr > 100 ||
+memcached.c:        if ((el - c->rcurr) > 1 && *(el - 1) == '\r') {
+memcached.c:            el--;
+memcached.c:        assert(cont <= (c->rcurr + c->rbytes));
+memcached.c:        c->last_cmd_time = current_time;
+memcached.c:        process_command(c, c->rcurr);
+memcached.c:        c->rbytes -= (cont - c->rcurr);
+memcached.c:        c->rcurr = cont;
+memcached.c:        assert(c->rcurr <= (c->rbuf + c->rsize));
+memcached.c:    c->request_addr_size = sizeof(c->request_addr);
+memcached.c:    res = recvfrom(c->sfd, c->rbuf, c->rsize,
+memcached.c:                   0, (struct sockaddr *)&c->request_addr,
+memcached.c:                   &c->request_addr_size);
+memcached.c:        unsigned char *buf = (unsigned char *)c->rbuf;
+memcached.c:        pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:        c->thread->stats.bytes_read += res;
+memcached.c:        pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:        c->request_id = buf[0] * 256 + buf[1];
+memcached.c:        /* If this is a multi-packet request, drop it. */
+memcached.c:            out_string(c, "SERVER_ERROR multi-packet request not supported");
+memcached.c:        res -= 8;
+memcached.c:        memmove(c->rbuf, c->rbuf + 8, res);
+memcached.c:        c->rbytes = res;
+memcached.c:        c->rcurr = c->rbuf;
+memcached.c:    if (c->rcurr != c->rbuf) {
+memcached.c:        if (c->rbytes != 0) /* otherwise there's nothing to copy */
+memcached.c:            memmove(c->rbuf, c->rcurr, c->rbytes);
+memcached.c:        c->rcurr = c->rbuf;
+memcached.c:        if (c->rbytes >= c->rsize) {
+memcached.c:            char *new_rbuf = realloc(c->rbuf, c->rsize * 2);
+memcached.c:                c->rbytes = 0; /* ignore what we read */
+memcached.c:                c->write_and_go = conn_closing;
+memcached.c:            c->rcurr = c->rbuf = new_rbuf;
+memcached.c:            c->rsize *= 2;
+memcached.c:        int avail = c->rsize - c->rbytes;
+memcached.c:        res = read(c->sfd, c->rbuf + c->rbytes, avail);
+memcached.c:            pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:            c->thread->stats.bytes_read += res;
+memcached.c:            pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:            c->rbytes += res;
+memcached.c:        if (res == -1) {
+memcached.c:    struct event_base *base = c->event.ev_base;
+memcached.c:    if (c->ev_flags == new_flags)
+memcached.c:    if (event_del(&c->event) == -1) return false;
+memcached.c:    event_set(&c->event, c->sfd, new_flags, event_handler, (void *)c);
+memcached.c:    event_base_set(base, &c->event);
+memcached.c:    c->ev_flags = new_flags;
+memcached.c:    if (event_add(&c->event, 0) == -1) return false;
+memcached.c:    for (next = listen_conn; next; next = next->next) {
+memcached.c:            if (listen(next->sfd, settings.backlog) != 0) {
+memcached.c:            if (listen(next->sfd, 0) != 0) {
+memcached.c:            (maxconns_exited.tv_sec - stats.maxconns_entered.tv_sec) * 1000000
+memcached.c:            + (maxconns_exited.tv_usec - stats.maxconns_entered.tv_usec);
+memcached.c:        maxconns_handler(-42, 0, 0);
+memcached.c: *   TRANSMIT_HARD_ERROR Can't write (c->state is set to conn_closing)
+memcached.c:    if (c->msgcurr < c->msgused &&
+memcached.c:            c->msglist[c->msgcurr].msg_iovlen == 0) {
+memcached.c:        c->msgcurr++;
+memcached.c:    if (c->msgcurr < c->msgused) {
+memcached.c:        struct msghdr *m = &c->msglist[c->msgcurr];
+memcached.c:        res = sendmsg(c->sfd, m, 0);
+memcached.c:            pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:            c->thread->stats.bytes_written += res;
+memcached.c:            pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:            while (m->msg_iovlen > 0 && res >= m->msg_iov->iov_len) {
+memcached.c:                res -= m->msg_iov->iov_len;
+memcached.c:                m->msg_iovlen--;
+memcached.c:                m->msg_iov++;
+memcached.c:                m->msg_iov->iov_base = (caddr_t)m->msg_iov->iov_base + res;
+memcached.c:                m->msg_iov->iov_len -= res;
+memcached.c:        if (res == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+memcached.c:        /* if res == 0 or res == -1 and error is not EAGAIN or EWOULDBLOCK,
+memcached.c:        if (IS_UDP(c->transport))
+memcached.c:    assert(c->rcurr != c->ritem);
+memcached.c:    while (c->rlbytes > 0) {
+memcached.c:        item_chunk *ch = (item_chunk *)c->ritem;
+memcached.c:        assert(ch->used <= ch->size);
+memcached.c:        if (ch->size == ch->used) {
+memcached.c:            // FIXME: ch->next is currently always 0. remove this?
+memcached.c:            if (ch->next) {
+memcached.c:                c->ritem = (char *) ch->next;
+memcached.c:                c->ritem = (char *) do_item_alloc_chunk(ch, c->rlbytes +
+memcached.c:                       ((c->protocol == binary_prot) ? 2 : 0));
+memcached.c:                if (!c->ritem) {
+memcached.c:                    total = -2;
+memcached.c:                //assert(c->rlbytes == 0);
+memcached.c:        int unused = ch->size - ch->used;
+memcached.c:        if (c->rbytes > 0) {
+memcached.c:            int tocopy = c->rbytes > c->rlbytes ? c->rlbytes : c->rbytes;
+memcached.c:            if (c->ritem != c->rcurr) {
+memcached.c:                memmove(ch->data + ch->used, c->rcurr, tocopy);
+memcached.c:            c->rlbytes -= tocopy;
+memcached.c:            c->rcurr += tocopy;
+memcached.c:            c->rbytes -= tocopy;
+memcached.c:            ch->used += tocopy;
+memcached.c:            if (c->rlbytes == 0) {
+memcached.c:            res = read(c->sfd, ch->data + ch->used,
+memcached.c:                    (unused > c->rlbytes ? c->rlbytes : unused));
+memcached.c:                pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:                c->thread->stats.bytes_read += res;
+memcached.c:                pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:                ch->used += res;
+memcached.c:                c->rlbytes -= res;
+memcached.c:    if (c->rlbytes == 0 && c->protocol == binary_prot && total >= 0) {
+memcached.c:        item_chunk *ch = (item_chunk *)c->ritem;
+memcached.c:        if (ch->size - ch->used < 2) {
+memcached.c:            c->ritem = (char *) do_item_alloc_chunk(ch, 2);
+memcached.c:            if (!c->ritem) {
+memcached.c:                total = -2;
+memcached.c:        switch(c->state) {
+memcached.c:                sfd = accept4(c->sfd, (struct sockaddr *)&addr, &addrlen, SOCK_NONBLOCK);
+memcached.c:                sfd = accept(c->sfd, (struct sockaddr *)&addr, &addrlen);
+memcached.c:            sfd = accept(c->sfd, (struct sockaddr *)&addr, &addrlen);
+memcached.c:            if (sfd == -1) {
+memcached.c:                stats_state.curr_conns + stats_state.reserved_fds >= settings.maxconns - 1) {
+memcached.c:                                     DATA_BUFFER_SIZE, c->transport);
+memcached.c:            res = IS_UDP(c->transport) ? try_read_udp(c) : try_read_network(c);
+memcached.c:            --nreqs;
+memcached.c:                pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:                c->thread->stats.conn_yields++;
+memcached.c:                pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:                if (c->rbytes > 0) {
+memcached.c:                       because that should be possible ;-)
+memcached.c:            if (c->rlbytes == 0) {
+memcached.c:            if (c->rlbytes < 0) {
+memcached.c:                    fprintf(stderr, "Invalid rlbytes to read: len %d\n", c->rlbytes);
+memcached.c:            if (!c->item || (((item *)c->item)->it_flags & ITEM_CHUNKED) == 0) {
+memcached.c:                if (c->rbytes > 0) {
+memcached.c:                    int tocopy = c->rbytes > c->rlbytes ? c->rlbytes : c->rbytes;
+memcached.c:                    if (c->ritem != c->rcurr) {
+memcached.c:                        memmove(c->ritem, c->rcurr, tocopy);
+memcached.c:                    c->ritem += tocopy;
+memcached.c:                    c->rlbytes -= tocopy;
+memcached.c:                    c->rcurr += tocopy;
+memcached.c:                    c->rbytes -= tocopy;
+memcached.c:                    if (c->rlbytes == 0) {
+memcached.c:                res = read(c->sfd, c->ritem, c->rlbytes);
+memcached.c:                    pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:                    c->thread->stats.bytes_read += res;
+memcached.c:                    pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:                    if (c->rcurr == c->ritem) {
+memcached.c:                        c->rcurr += res;
+memcached.c:                    c->ritem += res;
+memcached.c:                    c->rlbytes -= res;
+memcached.c:            if (res == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+memcached.c:            if (res == -2) {
+memcached.c:                c->sbytes = c->rlbytes;
+memcached.c:                c->write_and_go = conn_swallow;
+memcached.c:                        (long)c->rcurr, (long)c->ritem, (long)c->rbuf,
+memcached.c:                        (int)c->rlbytes, (int)c->rsize);
+memcached.c:            if (c->sbytes <= 0) {
+memcached.c:            if (c->rbytes > 0) {
+memcached.c:                int tocopy = c->rbytes > c->sbytes ? c->sbytes : c->rbytes;
+memcached.c:                c->sbytes -= tocopy;
+memcached.c:                c->rcurr += tocopy;
+memcached.c:                c->rbytes -= tocopy;
+memcached.c:            res = read(c->sfd, c->rbuf, c->rsize > c->sbytes ? c->sbytes : c->rsize);
+memcached.c:                pthread_mutex_lock(&c->thread->stats.mutex);
+memcached.c:                c->thread->stats.bytes_read += res;
+memcached.c:                pthread_mutex_unlock(&c->thread->stats.mutex);
+memcached.c:                c->sbytes -= res;
+memcached.c:            if (res == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+memcached.c:             * assemble it into a msgbuf list (this will be a single-entry
+memcached.c:             * list for TCP or a two-entry list for UDP).
+memcached.c:            if (c->iovused == 0 || (IS_UDP(c->transport) && c->iovused == 1)) {
+memcached.c:                if (add_iov(c, c->wcurr, c->wbytes) != 0) {
+memcached.c:            if (c->io_wrapleft) {
+memcached.c:                assert(c->io_queued == false);
+memcached.c:                assert(c->io_wraplist != NULL);
+memcached.c:                event_del(&c->event);
+memcached.c:                c->io_queued = true;
+memcached.c:                extstore_submit(c->thread->storage, &c->io_wraplist->io);
+memcached.c:          if (IS_UDP(c->transport) && c->msgcurr == 0 && build_udp_headers(c) != 0) {
+memcached.c:                if (c->state == conn_mwrite) {
+memcached.c:                    if(c->protocol == binary_prot) {
+memcached.c:                        conn_set_state(c, c->write_and_go);
+memcached.c:                } else if (c->state == conn_write) {
+memcached.c:                    if (c->write_and_free) {
+memcached.c:                        free(c->write_and_free);
+memcached.c:                        c->write_and_free = 0;
+memcached.c:                    conn_set_state(c, c->write_and_go);
+memcached.c:                        fprintf(stderr, "Unexpected state %d\n", c->state);
+memcached.c:            if (IS_UDP(c->transport))
+memcached.c:    c->which = which;
+memcached.c:    if (fd != c->sfd) {
+memcached.c:    if ((sfd = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol)) == -1) {
+memcached.c:        return -1;
+memcached.c:        return -1;
+memcached.c:    /* Binary-search for the real maximum. */
+memcached.c:            max = avg - 1;
+memcached.c:    if (port == -1) {
+memcached.c:    for (next= ai; next; next= next->ai_next) {
+memcached.c:        if ((sfd = new_socket(next)) == -1) {
+memcached.c:        if (next->ai_family == AF_INET6) {
+memcached.c:        if (bind(sfd, next->ai_addr, next->ai_addrlen) == -1) {
+memcached.c:            if (!IS_UDP(transport) && listen(sfd, settings.backlog) == -1) {
+memcached.c:                (next->ai_addr->sa_family == AF_INET ||
+memcached.c:                 next->ai_addr->sa_family == AF_INET6)) {
+memcached.c:                    if (next->ai_addr->sa_family == AF_INET) {
+memcached.c:                 * The dispatch code round-robins new connection requests
+memcached.c:            listen_conn_add->next = listen_conn;
+memcached.c:                // If no more semicolons - attempt to treat as port number.
+memcached.c:                // of course there was an RFC3986 IPv6 address previously specified -
+memcached.c:    if ((sfd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
+memcached.c:        return -1;
+memcached.c:        return -1;
+memcached.c:    if ((sfd = new_socket_unix()) == -1) {
+memcached.c:    strncpy(addr.sun_path, path, sizeof(addr.sun_path) - 1);
+memcached.c:    if (bind(sfd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
+memcached.c:    if (listen(sfd, settings.backlog) == -1) {
+memcached.c: * of requests a second) and allows us to use server-start-relative timestamps
+memcached.c:        /* process_started is initialized to time() - 2. We initialize to 1 so
+memcached.c:            monotonic_start = ts.tv_sec - ITEM_UPDATE_INTERVAL - 2;
+memcached.c:        if (clock_gettime(CLOCK_MONOTONIC, &ts) == -1)
+memcached.c:        current_time = (rel_time_t) (ts.tv_sec - monotonic_start);
+memcached.c:        current_time = (rel_time_t) (tv.tv_sec - process_started);
+memcached.c:    printf("-p, --port=<num>          TCP port to listen on (default: 11211)\n"
+memcached.c:           "-U, --udp-port=<num>      UDP port to listen on (default: 0, off)\n"
+memcached.c:           "-s, --unix-socket=<file>  UNIX socket to listen on (disables network support)\n"
+memcached.c:           "-A, --enable-shutdown     enable ascii \"shutdown\" command\n"
+memcached.c:           "-a, --unix-mask=<mask>    access mask for UNIX socket, in octal (default: 0700)\n"
+memcached.c:           "-l, --listen=<addr>       interface to listen on (default: INADDR_ANY)\n"
+memcached.c:           "-d, --daemon              run as a daemon\n"
+memcached.c:           "-r, --enable-coredumps    maximize core file limit\n"
+memcached.c:           "-u, --user=<user>         assume identity of <username> (only when run as root)\n"
+memcached.c:           "-m, --memory-limit=<num>  item memory in megabytes (default: 64 MB)\n"
+memcached.c:           "-M, --disable-evictions   return error on memory exhausted instead of evicting\n"
+memcached.c:           "-c, --conn-limit=<num>    max simultaneous connections (default: 1024)\n"
+memcached.c:           "-k, --lock-memory         lock down all paged memory\n"
+memcached.c:           "-v, --verbose             verbose (print errors/warnings while in event loop)\n"
+memcached.c:           "-vv                       very verbose (also print client commands/responses)\n"
+memcached.c:           "-vvv                      extremely verbose (internal state transitions)\n"
+memcached.c:           "-h, --help                print this help and exit\n"
+memcached.c:           "-i, --license             print memcached and libevent license\n"
+memcached.c:           "-V, --version             print version and exit\n"
+memcached.c:           "-P, --pidfile=<file>      save PID in <file>, only used with -d option\n"
+memcached.c:           "-f, --slab-growth-factor=<num> chunk size growth factor (default: 1.25)\n"
+memcached.c:           "-n, --slab-min-size=<bytes> min space used for key+value+flags (default: 48)\n");
+memcached.c:    printf("-L, --enable-largepages  try to use large memory pages (if available)\n");
+memcached.c:    printf("-D <char>     Use <char> as the delimiter between key prefixes and IDs.\n"
+memcached.c:           "              This is used for per-prefix stats reporting. The default is\n"
+memcached.c:    printf("-t, --threads=<num>       number of threads to use (default: 4)\n");
+memcached.c:    printf("-R, --max-reqs-per-event  maximum number of requests per event, limits the\n"
+memcached.c:    printf("-C, --disable-cas         disable use of CAS\n");
+memcached.c:    printf("-b, --listen-backlog=<num> set the backlog queue limit (default: 1024)\n");
+memcached.c:    printf("-B, --protocol=<name>     protocol - one of ascii, binary, or auto (default)\n");
+memcached.c:    printf("-I, --max-item-size=<num> adjusts max item size\n"
+memcached.c:    printf("-S, --enable-sasl         turn on Sasl authentication\n");
+memcached.c:    printf("-F, --disable-flush-all   disable flush_all command\n");
+memcached.c:    printf("-X, --disable-dumping     disable stats cachedump and lru_crawler metadump\n");
+memcached.c:    printf("-o, --extended            comma separated list of extended options\n"
+memcached.c:           "   - maxconns_fast:       immediately close new connections after limit\n"
+memcached.c:           "   - hashpower:           an integer multiplier for how large the hash\n"
+memcached.c:           "   - tail_repair_time:    time in seconds for how long to wait before\n"
+memcached.c:           "   - hash_algorithm:      the hash table algorithm\n"
+memcached.c:           "   - lru_crawler:         enable LRU Crawler background thread\n"
+memcached.c:           "   - lru_crawler_sleep:   microseconds to sleep between items\n"
+memcached.c:           "   - lru_crawler_tocrawl: max items to crawl per slab per run\n"
+memcached.c:           "   - lru_maintainer:      enable new LRU system + background thread\n"
+memcached.c:           "   - hot_lru_pct:         pct of slab memory to reserve for hot lru.\n"
+memcached.c:           "   - warm_lru_pct:        pct of slab memory to reserve for warm lru.\n"
+memcached.c:           "   - hot_max_factor:      items idle > cold lru age * drop from hot lru.\n"
+memcached.c:           "   - warm_max_factor:     items idle > cold lru age * this drop from warm.\n"
+memcached.c:           "   - temporary_ttl:       TTL's below get separate LRU, can't be evicted.\n"
+memcached.c:           "   - idle_timeout:        timeout for idle connections\n"
+memcached.c:           "   - slab_chunk_max:      (EXPERIMENTAL) maximum slab size. use extreme care.\n"
+memcached.c:           "   - watcher_logbuf_size: size in kilobytes of per-watcher write buffer.\n"
+memcached.c:           "   - worker_logbuf_size:  size in kilobytes of per-worker-thread buffer\n"
+memcached.c:           "   - track_sizes:         enable dynamic reports for 'stats sizes' command.\n"
+memcached.c:           "   - no_inline_ascii_resp: save up to 24 bytes per item.\n"
+memcached.c:           "   - no_hashexpand:       disables hash table expansion (dangerous)\n"
+memcached.c:           "   - modern:              enables options which will be default in future.\n"
+memcached.c:           "   - no_modern:           uses defaults of previous major version (1.4.x)\n"
+memcached.c:           "   - no_drop_privileges: Disable drop_privileges in case it causes issues with\n"
+memcached.c:           "   - relaxed_privileges: Running tests requires extra privileges.\n"
+memcached.c:           "   - ext_path:            file to write to for external storage.\n"
+memcached.c:           "   - ext_page_size:       size in megabytes of storage pages.\n"
+memcached.c:           "   - ext_wbuf_size:       size in megabytes of page write buffers.\n"
+memcached.c:           "   - ext_threads:         number of IO threads to run.\n"
+memcached.c:           "   - ext_item_size:       store items larger than this (bytes)\n"
+memcached.c:           "   - ext_item_age:        store items idle at least this long\n"
+memcached.c:           "   - ext_low_ttl:         consider TTLs lower than this specially\n"
+memcached.c:           "   - ext_drop_unread:     don't re-write unread values during compaction\n"
+memcached.c:           "   - ext_recache_rate:    recache an item every N accesses\n"
+memcached.c:           "   - ext_compact_under:   compact when fewer than this many free pages\n"
+memcached.c:           "   - ext_drop_under:      drop COLD items when fewer than this many free pages\n"
+memcached.c:           "   - ext_max_frag:        max page fragmentation to tolerage\n"
+memcached.c:    "Copyright 2000-2003 Niels Provos <provos@citi.umich.edu>\n"
+memcached.c:    if (fclose(fp) == -1) {
+memcached.c:    if (sigemptyset(&sa.sa_mask) == -1 || sigaction(sig, &sa, 0) == -1) {
+memcached.c:        return -1;
+memcached.c: * number of TLB-misses by using the biggest available page size
+memcached.c:    int ret = -1;
+memcached.c:    if (avail != -1) {
+memcached.c:        if (memcntl(0, 0, MC_HAT_ADVISE, (caddr_t)&arg, 0, 0) == -1) {
+memcached.c:    return -1;
+memcached.c:    for (char *p = strtok_r(s, "-", &b);
+memcached.c:         p = strtok_r(NULL, "-", &b)) {
+memcached.c:        if (i >= MAX_NUMBER_OF_SLAB_CLASSES-1) {
+memcached.c:    /* set stderr non-buffering (for running under, say, daemontools) */
+memcached.c:        {"unix-mask", required_argument, 0, 'a'},
+memcached.c:        {"enable-shutdown", no_argument, 0, 'A'},
+memcached.c:        {"unix-socket", required_argument, 0, 's'},
+memcached.c:        {"udp-port", required_argument, 0, 'U'},
+memcached.c:        {"memory-limit", required_argument, 0, 'm'},
+memcached.c:        {"disable-evictions", no_argument, 0, 'M'},
+memcached.c:        {"conn-limit", required_argument, 0, 'c'},
+memcached.c:        {"lock-memory", no_argument, 0, 'k'},
+memcached.c:        {"enable-coredumps", no_argument, 0, 'r'},
+memcached.c:        {"slab-growth-factor", required_argument, 0, 'f'},
+memcached.c:        {"slab-min-size", required_argument, 0, 'n'},
+memcached.c:        {"enable-largepages", no_argument, 0, 'L'},
+memcached.c:        {"max-reqs-per-event", required_argument, 0, 'R'},
+memcached.c:        {"disable-cas", no_argument, 0, 'C'},
+memcached.c:        {"listen-backlog", required_argument, 0, 'b'},
+memcached.c:        {"max-item-size", required_argument, 0, 'I'},
+memcached.c:        {"enable-sasl", no_argument, 0, 'S'},
+memcached.c:        {"disable-flush-all", no_argument, 0, 'F'},
+memcached.c:        {"disable-dumping", no_argument, 0, 'X'},
+memcached.c:    while (-1 != (c = getopt_long(argc, argv, shortopts,
+memcached.c:    while (-1 != (c = getopt(argc, argv, shortopts))) {
+memcached.c:                        " -- should be one of auto, binary, or ascii\n", optarg);
+memcached.c:            unit = buf[strlen(buf)-1];
+memcached.c:                buf[strlen(buf)-1] = '\0';
+memcached.c:        case 'o': /* It's sub-opts time! */
+memcached.c:        fprintf(stderr, "slab_chunk_max (bytes: %d) cannot be larger than -I (item_size_max %d)\n",
+memcached.c:        fprintf(stderr, "-I (item_size_max: %d) must be evenly divisible by slab_chunk_max (bytes: %d)\n",
+memcached.c:            fprintf(stderr, "-I (item_size_max: %d) cannot be larger than ext_wbuf_size: %d\n",
+memcached.c:            fprintf(stderr, "Cannot use UDP with extstore enabled (-U 0 to disable)\n");
+memcached.c:            fprintf(stderr, "can't run as root without the -u switch\n");
+memcached.c:        if (setgid(pw->pw_gid) < 0 || setuid(pw->pw_uid) < 0) {
+memcached.c:    /* Initialize Sasl if -S was specified */
+memcached.c:        if (sigignore(SIGHUP) == -1) {
+memcached.c:        if (daemonize(maxcore, settings.verbose) == -1) {
+memcached.c:            fprintf(stderr, "warning: -k invalid, mlockall() failed: %s\n",
+memcached.c:        fprintf(stderr, "warning: -k invalid, mlockall() not supported on this platform.  proceeding without.\n");
+memcached.c:    /* If libevent version is larger/equal to 2.0.2-alpha, use newer version */
+memcached.c:            /* Only rescues non-COLD items if below this threshold */
+memcached.c:    if (sigignore(SIGPIPE) == -1) {
+memcached.c:    if (start_assoc_maint && start_assoc_maintenance_thread() == -1) {
+memcached.c:        start_slab_maintenance_thread() == -1) {
+memcached.c:    if (settings.idle_timeout && start_conn_timeout_thread() == -1) {
+memcached.c:    if (stats_state.curr_conns + stats_state.reserved_fds >= settings.maxconns - 1) {
+memcached.c:        fprintf(stderr, "Maxconns setting is too low, use -c to increase.\n");
+murmur3_hash.c://-----------------------------------------------------------------------------
+murmur3_hash.c:// Note - The x86 and x64 versions do _not_ produce the same results, as the
+murmur3_hash.c:// non-native version will be less than optimal.
+murmur3_hash.c://-----------------------------------------------------------------------------
+murmur3_hash.c:// Platform-specific functions and macros
+murmur3_hash.c:  return (x << r) | (x >> (32 - r));
+murmur3_hash.c://-----------------------------------------------------------------------------
+murmur3_hash.c:// Block read - if your platform needs to do endian-swapping or can only
+murmur3_hash.c://-----------------------------------------------------------------------------
+murmur3_hash.c:// Finalization mix - force all bits of a hash block to avalanche
+murmur3_hash.c://-----------------------------------------------------------------------------
+murmur3_hash.c:  //----------
+murmur3_hash.c:  for(int i = -nblocks; i; i++)
+murmur3_hash.c:  //----------
+murmur3_hash.c:  //----------
+openbsd_priv.c:       if (pledge("stdio unix", NULL) == -1) {
+openbsd_priv.c:       if (pledge("stdio inet", NULL) == -1) {
+sasl_defs.c:/* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
+sasl_defs.c:    if ((passlen + unmlen) > (MAX_ENTRY_LEN - 4)) {
+sasl_defs.c:    if (gethostname(my_sasl_hostname, sizeof(my_sasl_hostname)-1) == -1) {
+sizes.c:            - (200 * sizeof(struct slab_stats)));
+sizes.c:            sizeof(LIBEVENT_THREAD) - sizeof(struct thread_stats));
+sizes.c:    printf("----------------------------------------\n");
+slab_automove.c:/* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
+slab_automove.c:    uint32_t window_size = settings->slab_automove_window;
+slab_automove.c:    double max_age_ratio = settings->slab_automove_ratio;
+slab_automove.c:    a->window_data = calloc(window_size * MAX_NUMBER_OF_SLAB_CLASSES, sizeof(struct window_data));
+slab_automove.c:    a->window_size = window_size;
+slab_automove.c:    a->max_age_ratio = max_age_ratio;
+slab_automove.c:    if (a->window_data == NULL) {
+slab_automove.c:    fill_item_stats_automove(a->iam_before);
+slab_automove.c:    fill_slab_stats_automove(a->sam_before);
+slab_automove.c:    free(a->window_data);
+slab_automove.c:        w->age += d->age;
+slab_automove.c:        w->dirty += d->dirty;
+slab_automove.c:        w->evicted += d->evicted;
+slab_automove.c:    int oldest = -1;
+slab_automove.c:    int youngest = -1;
+slab_automove.c:    *src = -1;
+slab_automove.c:    *dst = -1;
+slab_automove.c:    fill_item_stats_automove(a->iam_after);
+slab_automove.c:    fill_slab_stats_automove(a->sam_after);
+slab_automove.c:    a->window_cur++;
+slab_automove.c:        int w_offset = n * a->window_size;
+slab_automove.c:        struct window_data *wd = &a->window_data[w_offset + (a->window_cur % a->window_size)];
+slab_automove.c:        // summarize the window-up-to-now.
+slab_automove.c:        window_sum(&a->window_data[w_offset], &w_sum, a->window_size);
+slab_automove.c:        if (a->iam_after[n].evicted - a->iam_before[n].evicted > 0 ||
+slab_automove.c:            a->iam_after[n].outofmemory - a->iam_before[n].outofmemory > 0) {
+slab_automove.c:            wd->evicted = 1;
+slab_automove.c:            wd->dirty = 1;
+slab_automove.c:        if (a->sam_after[n].total_pages - a->sam_before[n].total_pages > 0) {
+slab_automove.c:            wd->dirty = 1;
+slab_automove.c:        wd->age = a->iam_after[n].age;
+slab_automove.c:        uint64_t age = w_sum.age / a->window_size;
+slab_automove.c:        if (a->sam_after[n].free_chunks > a->sam_after[n].chunks_per_page * MIN_PAGES_FOR_RECLAIM) {
+slab_automove.c:        if (age > oldest_age && a->sam_after[n].total_pages > MIN_PAGES_FOR_SOURCE) {
+slab_automove.c:        if (age < youngest_age && w_sum.evicted > a->window_size / 2) {
+slab_automove.c:            youngest_evicting = wd->evicted ? true : false;
+slab_automove.c:    memcpy(a->iam_before, a->iam_after,
+slab_automove.c:    memcpy(a->sam_before, a->sam_after,
+slab_automove.c:    if (youngest != -1 && oldest != -1 && a->window_cur > a->window_size) {
+slab_automove.c:        if (youngest_age < ((double)oldest_age * a->max_age_ratio) && youngest_evicting) {
+slab_automove_extstore.c:/* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
+slab_automove_extstore.c:    uint32_t window_size = settings->slab_automove_window;
+slab_automove_extstore.c:    double max_age_ratio = settings->slab_automove_ratio;
+slab_automove_extstore.c:    a->window_data = calloc(window_size * MAX_NUMBER_OF_SLAB_CLASSES, sizeof(struct window_data));
+slab_automove_extstore.c:    a->window_global = calloc(window_size, sizeof(struct window_global));
+slab_automove_extstore.c:    a->window_size = window_size;
+slab_automove_extstore.c:    a->max_age_ratio = max_age_ratio;
+slab_automove_extstore.c:    a->free_ratio = settings->slab_automove_freeratio;
+slab_automove_extstore.c:    a->item_size = settings->ext_item_size;
+slab_automove_extstore.c:    a->last_memcheck_run = 0;
+slab_automove_extstore.c:    a->settings = settings;
+slab_automove_extstore.c:    a->pool_filled_once = false;
+slab_automove_extstore.c:    if (a->window_data == NULL || a->window_global == NULL) {
+slab_automove_extstore.c:        if (a->window_data)
+slab_automove_extstore.c:            free(a->window_data);
+slab_automove_extstore.c:        if (a->window_global)
+slab_automove_extstore.c:            free(a->window_global);
+slab_automove_extstore.c:    fill_item_stats_automove(a->iam_before);
+slab_automove_extstore.c:    fill_slab_stats_automove(a->sam_before);
+slab_automove_extstore.c:    free(a->window_data);
+slab_automove_extstore.c:        w->age += d->age;
+slab_automove_extstore.c:        w->dirty += d->dirty;
+slab_automove_extstore.c:        w->evicted += d->evicted;
+slab_automove_extstore.c:        w->excess_free += d->excess_free;
+slab_automove_extstore.c:        w->relaxed += d->relaxed;
+slab_automove_extstore.c:        w->pool_high += d->pool_high;
+slab_automove_extstore.c:        w->pool_low += d->pool_low;
+slab_automove_extstore.c:    uint32_t free = a->free_mem[0];
+slab_automove_extstore.c:    struct window_global *wg = &a->window_global[a->window_cur % a->window_size];
+slab_automove_extstore.c:        wg->pool_low = 1;
+slab_automove_extstore.c:        a->pool_filled_once = true;
+slab_automove_extstore.c:        wg->pool_high = 1;
+slab_automove_extstore.c:        a->pool_filled_once = true;
+slab_automove_extstore.c:    if (current_time < a->last_memcheck_run + MEMCHECK_PERIOD)
+slab_automove_extstore.c:    a->last_memcheck_run = current_time;
+slab_automove_extstore.c:        slab_stats_automove *sam = &a->sam_after[n];
+slab_automove_extstore.c:        total_pages += sam->total_pages;
+slab_automove_extstore.c:        unsigned int hold_free = (sam->total_pages * sam->chunks_per_page)
+slab_automove_extstore.c:            * a->free_ratio;
+slab_automove_extstore.c:        if (sam->chunks_per_page * MIN_PAGES_FREE > hold_free)
+slab_automove_extstore.c:            hold_free = sam->chunks_per_page * MIN_PAGES_FREE;
+slab_automove_extstore.c:        a->free_mem[n] = hold_free;
+slab_automove_extstore.c:        if (a->settings->ext_free_memchunks[n] != hold_free && a->pool_filled_once) {
+slab_automove_extstore.c:            a->settings->ext_free_memchunks[n] = hold_free;
+slab_automove_extstore.c:    total_pages += a->sam_after[0].total_pages;
+slab_automove_extstore.c:    a->free_mem[0] = total_pages * a->free_ratio;
+slab_automove_extstore.c:    int w_offset = class * a->window_size;
+slab_automove_extstore.c:    return &a->window_data[w_offset + (a->window_cur % a->window_size)];
+slab_automove_extstore.c:    int oldest = -1;
+slab_automove_extstore.c:    int youngest = -1;
+slab_automove_extstore.c:    *src = -1;
+slab_automove_extstore.c:    *dst = -1;
+slab_automove_extstore.c:    window_global_sum(a->window_global, &wg_sum, a->window_size);
+slab_automove_extstore.c:    fill_item_stats_automove(a->iam_after);
+slab_automove_extstore.c:    fill_slab_stats_automove(a->sam_after);
+slab_automove_extstore.c:    a->window_cur++;
+slab_automove_extstore.c:        bool small_slab = a->sam_before[n].chunk_size < a->item_size
+slab_automove_extstore.c:        // summarize the window-up-to-now.
+slab_automove_extstore.c:        int w_offset = n * a->window_size;
+slab_automove_extstore.c:        window_sum(&a->window_data[w_offset], &w_sum, a->window_size);
+slab_automove_extstore.c:        if (a->iam_after[n].evicted - a->iam_before[n].evicted > 0 ||
+slab_automove_extstore.c:            a->iam_after[n].outofmemory - a->iam_before[n].outofmemory > 0) {
+slab_automove_extstore.c:            wd->evicted = 1;
+slab_automove_extstore.c:            wd->dirty = 1;
+slab_automove_extstore.c:        if (a->sam_after[n].total_pages - a->sam_before[n].total_pages > 0) {
+slab_automove_extstore.c:            wd->dirty = 1;
+slab_automove_extstore.c:        if (a->sam_after[n].free_chunks > a->free_mem[n]) {
+slab_automove_extstore.c:        if (a->sam_after[n].free_chunks > (a->free_mem[n] * 2) && a->free_mem[n] > 0) {
+slab_automove_extstore.c:            wd->excess_free = 1;
+slab_automove_extstore.c:        wd->age = a->iam_after[n].age;
+slab_automove_extstore.c:        uint64_t age = w_sum.age / a->window_size;
+slab_automove_extstore.c:        if (a->sam_after[n].free_chunks > a->sam_after[n].chunks_per_page * MIN_PAGES_FOR_RECLAIM
+slab_automove_extstore.c:            } else if (!small_slab && w_sum.excess_free >= a->window_size) {
+slab_automove_extstore.c:                    && a->sam_after[n].total_pages > MIN_PAGES_FOR_SOURCE) {
+slab_automove_extstore.c:            if (age < youngest_age && a->sam_after[n].total_pages != 0
+slab_automove_extstore.c:                    && w_sum.excess_free < a->window_size
+slab_automove_extstore.c:    memcpy(a->iam_before, a->iam_after,
+slab_automove_extstore.c:    memcpy(a->sam_before, a->sam_after,
+slab_automove_extstore.c:    if (a->window_cur < a->window_size)
+slab_automove_extstore.c:    if (wg_sum.pool_high >= a->window_size && !wg_sum.pool_low && youngest != -1) {
+slab_automove_extstore.c:        if (a->sam_after[youngest].free_chunks <= a->free_mem[youngest]) {
+slab_automove_extstore.c:        wd->relaxed = 1;
+slab_automove_extstore.c:    } else if (!too_free && wg_sum.pool_low && oldest != -1) {
+slab_automove_extstore.c:    } else if (!too_free && youngest != -1 && oldest != -1 && youngest != oldest) {
+slab_automove_extstore.c:        if (youngest_age < ((double)oldest_age * a->max_age_ratio)) {
+slab_automove_extstore.c:            wd->relaxed = 1;
+slab_automove_extstore.c:            if (a->sam_after[youngest].free_chunks <= a->free_mem[youngest]) {
+slabs.c:/* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
+slabs.c: * Slabs memory allocation, based on powers-of-N. Slabs are up to 1MB in size
+slabs.c:/* powers-of-N allocation structures */
+slabs.c: * early-wake the LRU maintenance thread */
+slabs.c:   on start-up, so users don't get confused out-of-memory errors when
+slabs.c:   they do have free (in-slab) space, but no space to make new slabs.
+slabs.c:   if maxslabs is 18 (POWER_LARGEST - POWER_SMALLEST + 1), then all
+slabs.c:    int i = POWER_SMALLEST - 1;
+slabs.c:    while (++i < MAX_NUMBER_OF_SLAB_CLASSES-1) {
+slabs.c:            if (slab_sizes[i-1] == 0)
+slabs.c:            size = slab_sizes[i-1];
+slabs.c:        /* Make sure items are always n-byte aligned */
+slabs.c:            size += CHUNK_ALIGN_BYTES - (size % CHUNK_ALIGN_BYTES);
+slabs.c:        p->slab_list[p->slabs++] = ptr;
+slabs.c:    /* pre-allocate a 1MB slab in every size class so people don't get
+slabs.c:       confused by non-intuitive "SERVER_ERROR out of memory"
+slabs.c:                "If using -L or other prealloc options, max memory must be "
+slabs.c:    if (p->slabs == p->list_size) {
+slabs.c:        size_t new_size =  (p->list_size != 0) ? p->list_size * 2 : 16;
+slabs.c:        void *new_list = realloc(p->slab_list, new_size * sizeof(void *));
+slabs.c:        p->list_size = new_size;
+slabs.c:        p->slab_list = new_list;
+slabs.c:    for (x = 0; x < p->perslab; x++) {
+slabs.c:        ptr += p->size;
+slabs.c:    if (p->slabs < 1) {
+slabs.c:    char *ret = p->slab_list[p->slabs - 1];
+slabs.c:    p->slabs--;
+slabs.c:        : p->size * p->perslab;
+slabs.c:    if ((mem_limit && mem_malloced + len > mem_limit && p->slabs > 0
+slabs.c:         && g->slabs == 0)) {
+slabs.c:    p->slab_list[p->slabs++] = ptr;
+slabs.c:    assert(p->sl_curr == 0 || ((item *)p->slots)->slabs_clsid == 0);
+slabs.c:        *total_bytes = p->requested;
+slabs.c:    assert(size <= p->size);
+slabs.c:    if (p->sl_curr == 0 && flags != SLABS_ALLOC_NO_NEWPAGE) {
+slabs.c:    if (p->sl_curr != 0) {
+slabs.c:        it = (item *)p->slots;
+slabs.c:        p->slots = it->next;
+slabs.c:        if (it->next) it->next->prev = 0;
+slabs.c:        it->it_flags &= ~ITEM_SLABBED;
+slabs.c:        it->refcount = 1;
+slabs.c:        p->sl_curr--;
+slabs.c:        p->requested += size;
+slabs.c:        MEMCACHED_SLABS_ALLOCATE(size, id, p->size, ret);
+slabs.c:    it->it_flags = ITEM_SLABBED;
+slabs.c:    it->slabs_clsid = 0;
+slabs.c:    it->prev = 0;
+slabs.c:    p = &slabclass[chunk->orig_clsid];
+slabs.c:    if (chunk->next) {
+slabs.c:        chunk = chunk->next;
+slabs.c:        chunk->prev = 0;
+slabs.c:    it->prev = 0;
+slabs.c:    it->next = p->slots;
+slabs.c:    if (it->next) it->next->prev = it;
+slabs.c:    p->slots = it;
+slabs.c:    p->sl_curr++;
+slabs.c:    p->requested -= it->nkey + 1 + it->nsuffix + sizeof(item) + sizeof(item_chunk);
+slabs.c:        p->requested -= sizeof(uint64_t);
+slabs.c:        assert(chunk->it_flags == ITEM_CHUNK);
+slabs.c:        chunk->it_flags = ITEM_SLABBED;
+slabs.c:        p = &slabclass[chunk->slabs_clsid];
+slabs.c:        chunk->slabs_clsid = 0;
+slabs.c:        next_chunk = chunk->next;
+slabs.c:        chunk->prev = 0;
+slabs.c:        chunk->next = p->slots;
+slabs.c:        if (chunk->next) chunk->next->prev = chunk;
+slabs.c:        p->slots = chunk;
+slabs.c:        p->sl_curr++;
+slabs.c:        p->requested -= chunk->size + sizeof(item_chunk);
+slabs.c:    if ((it->it_flags & ITEM_CHUNKED) == 0) {
+slabs.c:        bool is_hdr = it->it_flags & ITEM_HDR;
+slabs.c:        it->it_flags = ITEM_SLABBED;
+slabs.c:        it->slabs_clsid = 0;
+slabs.c:        it->prev = 0;
+slabs.c:        it->next = p->slots;
+slabs.c:        if (it->next) it->next->prev = it;
+slabs.c:        p->slots = it;
+slabs.c:        p->sl_curr++;
+slabs.c:            p->requested -= size;
+slabs.c:            p->requested -= (size - it->nbytes) + sizeof(item_hdr);
+slabs.c:        p->requested -= size;
+slabs.c:        cur->chunks_per_page = p->perslab;
+slabs.c:        cur->free_chunks = p->sl_curr;
+slabs.c:        cur->total_pages = p->slabs;
+slabs.c:        cur->chunk_size = p->size;
+slabs.c:    return (zlength == nzlength) && (strncmp(nz, z, zlength) == 0) ? 0 : -1;
+slabs.c:    /* Get the per-thread stats which contain some interesting aggregates */
+slabs.c:        if (p->slabs != 0) {
+slabs.c:            slabs = p->slabs;
+slabs.c:            perslab = p->perslab;
+slabs.c:            APPEND_NUM_STAT(i, "chunk_size", "%u", p->size);
+slabs.c:                            slabs*perslab - p->sl_curr);
+slabs.c:            APPEND_NUM_STAT(i, "free_chunks", "%u", p->sl_curr);
+slabs.c:                            (unsigned long long)p->requested);
+slabs.c:            size += CHUNK_ALIGN_BYTES - (size % CHUNK_ALIGN_BYTES);
+slabs.c:            mem_avail -= size;
+slabs.c:        mem_malloced -= settings.slab_page_size;
+slabs.c:    p->requested = p->requested - old + ntotal;
+slabs.c:    ret = p->sl_curr;
+slabs.c:        *total_bytes = p->requested;
+slabs.c:        *chunks_perslab = p->perslab;
+slabs.c:        no_go = -2;
+slabs.c:        no_go = -1;
+slabs.c:    if (s_cls->slabs < 2)
+slabs.c:        no_go = -3;
+slabs.c:    slab_rebal.slab_start = s_cls->slab_list[0];
+slabs.c:        (s_cls->size * s_cls->perslab);
+slabs.c:    for (x = 0; x < s_cls->perslab; x++) {
+slabs.c:            s_cls->requested -= size;
+slabs.c:            new_it->refcount = 0;
+slabs.c:            new_it->it_flags = ITEM_SLABBED|ITEM_FETCHED;
+slabs.c:    assert(it->it_flags == ITEM_SLABBED);
+slabs.c:    if (s_cls->slots == it) {
+slabs.c:        s_cls->slots = it->next;
+slabs.c:    if (it->next) it->next->prev = it->prev;
+slabs.c:    if (it->prev) it->prev->next = it->next;
+slabs.c:    s_cls->sl_curr--;
+slabs.c:        if (it->it_flags & ITEM_CHUNK) {
+slabs.c:            it = ch->head;
+slabs.c:            assert(it->it_flags & ITEM_CHUNKED);
+slabs.c:        if (it->it_flags != (ITEM_SLABBED|ITEM_FETCHED)) {
+slabs.c:            if (it->it_flags & ITEM_SLABBED) {
+slabs.c:            } else if ((it->it_flags & ITEM_LINKED) != 0) {
+slabs.c:                hv = hash(ITEM_key(it), it->nkey);
+slabs.c:                    bool is_linked = (it->it_flags & ITEM_LINKED);
+slabs.c:                            fprintf(stderr, "Slab reassign hit a busy item: refcount: %d (%d -> %d)\n",
+slabs.c:                                it->refcount, slab_rebal.s_clsid, slab_rebal.d_clsid);
+slabs.c:                /* Lock order is LRU locks -> slabs_lock. unlink uses LRU lock.
+slabs.c:                if (it->it_flags & ITEM_HDR) {
+slabs.c:                    ntotal = (ntotal - it->nbytes) + sizeof(item_hdr);
+slabs.c:                /* REQUIRES slabs_lock: CHECK FOR cls->sl_curr > 0 */
+slabs.c:                if (ch == NULL && (it->it_flags & ITEM_CHUNKED)) {
+slabs.c:                    /* Chunked should be identical to non-chunked, except we need
+slabs.c:                     * to swap out ntotal for the head-chunk-total. */
+slabs.c:                    ntotal = s_cls->size;
+slabs.c:                if ((it->exptime != 0 && it->exptime < current_time)
+slabs.c:                        (new_it = slab_rebalance_alloc(s_cls->size, slab_rebal.s_clsid)) == NULL) {
+slabs.c:                        assert((new_it->it_flags & ITEM_CHUNKED) == 0);
+slabs.c:                        new_it->prev = 0;
+slabs.c:                        new_it->next = 0;
+slabs.c:                        new_it->h_next = 0;
+slabs.c:                        new_it->it_flags &= ~ITEM_LINKED;
+slabs.c:                        new_it->refcount = 0;
+slabs.c:                        if (new_it->it_flags & ITEM_CHUNKED) {
+slabs.c:                            fch->next->prev = fch;
+slabs.c:                                fch->head = new_it;
+slabs.c:                                fch = fch->next;
+slabs.c:                        it->refcount = 0;
+slabs.c:                        it->it_flags = ITEM_SLABBED|ITEM_FETCHED;
+slabs.c:                        ch->prev->next = nch;
+slabs.c:                        if (ch->next)
+slabs.c:                            ch->next->prev = nch;
+slabs.c:                        memcpy(nch, ch, ch->used + sizeof(item_chunk));
+slabs.c:                        ch->refcount = 0;
+slabs.c:                        ch->it_flags = ITEM_SLABBED|ITEM_FETCHED;
+slabs.c:                        requested_adjust = s_cls->size;
+slabs.c:                s_cls->requested -= requested_adjust;
+slabs.c:                it->refcount = 0;
+slabs.c:                it->it_flags = ITEM_SLABBED|ITEM_FETCHED;
+slabs.c:        slab_rebal.slab_pos = (char *)slab_rebal.slab_pos + s_cls->size;
+slabs.c:        assert(it->it_flags == (ITEM_SLABBED|ITEM_FETCHED));
+slabs.c:        it->it_flags = ITEM_SLABBED|ITEM_FETCHED;
+slabs.c:        slab_rebal.slab_pos = (char *)slab_rebal.slab_pos + s_cls->size;
+slabs.c:    s_cls->slabs--;
+slabs.c:    for (x = 0; x < s_cls->slabs; x++) {
+slabs.c:        s_cls->slab_list[x] = s_cls->slab_list[x+1];
+slabs.c:    d_cls->slab_list[d_cls->slabs++] = slab_rebal.slab_start;
+slabs.c:    static int cur = POWER_SMALLEST - 1;
+slabs.c:    int tries = power_largest - POWER_SMALLEST + 1;
+slabs.c:    for (; tries > 0; tries--) {
+slabs.c:    return -1;
+slabs.c:    if (src == -1) {
+slabs.c:        /* TODO: If we end up back at -1, return a new error type */
+slabs.c:        return -1;
+slabs.c:        return -1;
+stats.c:/* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
+stats.c: * fixed-size hash of prefixes; we run the prefixes through the same
+stats.c:            next = cur->next;
+stats.c:            free(cur->prefix);
+stats.c:    for (pfs = prefix_stats[hashval]; NULL != pfs; pfs = pfs->next) {
+stats.c:        if (strncmp(pfs->prefix, key, length) == 0)
+stats.c:    pfs->prefix = malloc(length + 1);
+stats.c:    if (NULL == pfs->prefix) {
+stats.c:    strncpy(pfs->prefix, key, length);
+stats.c:    pfs->prefix[length] = '\0';      /* because strncpy() sucks */
+stats.c:    pfs->prefix_len = length;
+stats.c:    pfs->next = prefix_stats[hashval];
+stats.c:        pfs->num_gets++;
+stats.c:            pfs->num_hits++;
+stats.c:        pfs->num_deletes++;
+stats.c:        pfs->num_sets++;
+stats.c:     * the per-prefix output with 20-digit values for all the counts,
+stats.c:           num_prefixes * (strlen(format) - 2 /* %s */
+stats.c:                           + 4 * (20 - 4)) /* %llu replaced by 20-digit num */
+stats.c:        for (pfs = prefix_stats[i]; NULL != pfs; pfs = pfs->next) {
+stats.c:            written = snprintf(buf + pos, size-pos, format,
+stats.c:                           pfs->prefix, pfs->num_gets, pfs->num_hits,
+stats.c:                           pfs->num_sets, pfs->num_deletes);
+stats.c:      To run unit tests, compile with $(CC) -DUNIT_TEST stats.c assoc.o
+stats.c:        pfs1->num_gets + pfs1->num_sets + pfs1->num_deletes + pfs1->num_hits);
+stats.c:    test_equals_ull("get count after get #1", 1, pfs->num_gets);
+stats.c:    test_equals_ull("hit count after get #1", 0, pfs->num_hits);
+stats.c:    test_equals_ull("get count after get #2", 2, pfs->num_gets);
+stats.c:    test_equals_ull("hit count after get #2", 0, pfs->num_hits);
+stats.c:    test_equals_ull("get count after get #3", 3, pfs->num_gets);
+stats.c:    test_equals_ull("hit count after get #3", 1, pfs->num_hits);
+stats.c:    test_equals_ull("get count after get #4", 3, pfs->num_gets);
+stats.c:    test_equals_ull("hit count after get #4", 1, pfs->num_hits);
+stats.c:    test_equals_ull("get count after delete #1", 0, pfs->num_gets);
+stats.c:    test_equals_ull("hit count after delete #1", 0, pfs->num_hits);
+stats.c:    test_equals_ull("delete count after delete #1", 1, pfs->num_deletes);
+stats.c:    test_equals_ull("set count after delete #1", 0, pfs->num_sets);
+stats.c:    test_equals_ull("delete count after delete #2", 1, pfs->num_deletes);
+stats.c:    test_equals_ull("get count after set #1", 0, pfs->num_gets);
+stats.c:    test_equals_ull("hit count after set #1", 0, pfs->num_hits);
+stats.c:    test_equals_ull("delete count after set #1", 0, pfs->num_deletes);
+stats.c:    test_equals_ull("set count after set #1", 1, pfs->num_sets);
+stats.c:    test_equals_ull("set count after set #2", 1, pfs->num_sets);
+stats.c:    printf("\t%d / %d pass\n", (test_count - fail_count), test_count);
+storage.c:/* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
+storage.c:    if ((it->it_flags & ITEM_HDR) == 0 &&
+storage.c:            (item_age == 0 || current_time - it->time > item_age)) {
+storage.c:        } else if (it->nsuffix > 0) {
+storage.c:        item *hdr_it = do_item_alloc(ITEM_key(it), it->nkey, flags, it->exptime, sizeof(item_hdr));
+storage.c:            int bucket = (it->it_flags & ITEM_CHUNKED) ?
+storage.c:            if (it->exptime - current_time < settings.ext_low_ttl) {
+storage.c:            hdr_it->it_flags |= ITEM_HDR;
+storage.c:            assert(it->refcount >= 2);
+storage.c:                buf_it->time = it_info.hv;
+storage.c:                if (it->it_flags & ITEM_CHUNKED) {
+storage.c:                    int hdrtotal = ITEM_ntotal(it) - it->nbytes;
+storage.c:                    memcpy((char *)io.buf+32, (char *)it+32, hdrtotal - 32);
+storage.c:                        assert(remain >= sch->used);
+storage.c:                        memcpy((char *)io.buf+copied, sch->data, sch->used);
+storage.c:                        remain -= sch->used;
+storage.c:                        copied += sch->used;
+storage.c:                        sch = sch->next;
+storage.c:                    memcpy((char *)io.buf+32, (char *)it+32, io.len-32);
+storage.c:                buf_it->it_flags &= ~ITEM_LINKED;
+storage.c:                buf_it->exptime = crc32c(0, (char*)io.buf+32, orig_ntotal-32);
+storage.c:                hdr->page_version = io.page_version;
+storage.c:                hdr->page_id = io.page_id;
+storage.c:                hdr->offset  = io.offset;
+storage.c:                hdr_it->nbytes = it->nbytes;
+storage.c:                /* CAS gets set while linking. Copy post-replace */
+storage.c:    rate = 1.0 - ((double)st.pages_free / st.page_count);
+storage.c:        if (it->nkey == 0) {
+storage.c:        uint32_t hv = (uint32_t)it->time;
+storage.c:        hdr_it = assoc_find(ITEM_key(it), it->nkey, hv);
+storage.c:            if ((hdr_it->it_flags & ITEM_HDR) && !item_is_flushed(hdr_it) &&
+storage.c:                   (hdr_it->exptime == 0 || hdr_it->exptime > current_time)) {
+storage.c:                if (hdr->page_id == page_id && hdr->page_version == page_version) {
+storage.c:                    if (drop_unread && GET_LRU(hdr_it->slabs_clsid) == COLD_LRU) {
+storage.c:                for (tries = 10; tries > 0; tries--) {
+storage.c:                    if (it->refcount == 2) {
+storage.c:                        hdr->page_version = io.page_version;
+storage.c:                        hdr->page_id = io.page_id;
+storage.c:                        hdr->offset = io.offset;
+storage.c:                        // TODO: re-alloc and replace header.
+storage.c:        if (read_size - offset < sizeof(struct _stritem))
+storage.c:    struct storage_compact_wrap *wrap = (struct storage_compact_wrap *)io->data;
+storage.c:    assert(wrap->submitted == true);
+storage.c:    pthread_mutex_lock(&wrap->lock);
+storage.c:        wrap->miss = true;
+storage.c:    wrap->done = true;
+storage.c:    pthread_mutex_unlock(&wrap->lock);
+storage.c:                // FIXME: should be smarter about io->next (unlink at use?)
+storage.c:        return -1;
+storage.c:        return -1;
+testapp.c:/* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
+testapp.c:    char old = *(p - 1);
+testapp.c:    *(p - 1) = 0;
+testapp.c:    assert(cache_error == -1);
+testapp.c:    *(p - 1) = old;
+testapp.c:    assert(!safe_strtoul("123BOGUS", &val));  // non-numeric
+testapp.c:    assert(!safe_strtoul(" issue221", &val));  // non-numeric
+testapp.c:    assert(safe_strtoul("4294967295", &val)); // 2**32 - 1
+testapp.c:    /* This actually works on 64-bit ubuntu
+testapp.c:    assert(!safe_strtoul("-1", &val));  // negative
+testapp.c:    assert(!safe_strtoull("123BOGUS", &val));  // non-numeric
+testapp.c:    assert(!safe_strtoull(" issue221", &val));  // non-numeric
+testapp.c:    assert(safe_strtoull("18446744073709551615", &val)); // 2**64 - 1
+testapp.c:    assert(!safe_strtoull("-1", &val));  // negative
+testapp.c:    assert(safe_strtoll("-123", &val));
+testapp.c:    assert(val == -123);
+testapp.c:    assert(!safe_strtoll("123BOGUS", &val));  // non-numeric
+testapp.c:    assert(!safe_strtoll(" issue221", &val));  // non-numeric
+testapp.c:    assert(!safe_strtoll("18446744073709551615", &val)); // 2**64 - 1
+testapp.c:    assert(safe_strtoll("9223372036854775807", &val)); // 2**63 - 1
+testapp.c:      assert(safe_strtoll("-9223372036854775808", &val)); // -2**63
+testapp.c:      assert(val == -9223372036854775808LL);
+testapp.c:    assert(!safe_strtoll("-9223372036854775809", &val)); // -2**63 - 1
+testapp.c:    assert(safe_strtol("-123", &val));
+testapp.c:    assert(val == -123);
+testapp.c:    assert(!safe_strtol("123BOGUS", &val));  // non-numeric
+testapp.c:    assert(!safe_strtol(" issue221", &val));  // non-numeric
+testapp.c:    /* This actually works on 64-bit ubuntu
+testapp.c:    assert(safe_strtol("2147483647", &val)); // (- (expt 2.0 31) 1)
+testapp.c:    /* This actually works on 64-bit ubuntu
+testapp.c:       assert(!safe_strtol("-2147483649", &val)); // (- (expt -2.0 31) 1)
+testapp.c:             "coreadm -p core.%%f.%%p %lu", (unsigned long)getpid());
+testapp.c:    assert(pid != -1);
+testapp.c:        argv[arg++] = "./memcached-debug";
+testapp.c:        argv[arg++] = "-A";
+testapp.c:        argv[arg++] = "-p";
+testapp.c:        argv[arg++] = "-1";
+testapp.c:        argv[arg++] = "-U";
+testapp.c:            argv[arg++] = "-u";
+testapp.c:            argv[arg++] = "-d";
+testapp.c:            argv[arg++] = "-P";
+testapp.c:         argv[arg++] = "-vvv";
+testapp.c:        argv[arg++] = "-o";
+testapp.c:        assert(execv(argv[0], argv) != -1);
+testapp.c:    /* Yeah just let us "busy-wait" for the file to be created ;-) */
+testapp.c:    while (access(filename, F_OK) == -1) {
+testapp.c:    *port_out = (in_port_t)-1;
+testapp.c:        while (access(pid_file, F_OK) == -1) {
+testapp.c:    int sock = -1;
+testapp.c:       if ((sock = socket(ai->ai_family, ai->ai_socktype,
+testapp.c:                          ai->ai_protocol)) != -1) {
+testapp.c:          if (connect(sock, ai->ai_addr, ai->ai_addrlen) == -1) {
+testapp.c:             sock = -1;
+testapp.c:                  sock = -1;
+testapp.c:        ssize_t nw = write(sock, ptr + offset, len - offset);
+testapp.c:        if (nw == -1) {
+testapp.c: * implementation only supports single-line responses, so if you want to use
+testapp.c: * it for get commands you need to implement that first ;-)
+testapp.c:        if (nr == -1) {
+testapp.c:    buffer[sizeof(buffer) - 1] = '\0';
+testapp.c:        offset += snprintf(buffer + offset, sizeof(buffer) - offset,
+testapp.c:    int len = snprintf(buffer + 101, sizeof(buffer) - 101, "gets foo");
+testapp.c:    buffer[sizeof(buffer) - 1] = '\0';
+testapp.c:    if (server_pid != -1) {
+testapp.c:    /* We set server_pid to -1 so that we don't later call kill() */
+testapp.c:        server_pid = -1;
+testapp.c:        size_t num_bytes = len - offset;
+testapp.c:        if (nw == -1) {
+testapp.c:        ssize_t nr = read(sock, ((char*)buf) + offset, len - offset);
+testapp.c:        if (nr == -1) {
+testapp.c:    response->message.header.response.keylen = ntohs(response->message.header.response.keylen);
+testapp.c:    response->message.header.response.status = ntohs(response->message.header.response.status);
+testapp.c:    response->message.header.response.bodylen = ntohl(response->message.header.response.bodylen);
+testapp.c:    if (!safe_recv(ptr, response->message.header.response.bodylen)) {
+testapp.c:    len += response->message.header.response.bodylen;
+testapp.c:    request->message.header.request.magic = PROTOCOL_BINARY_REQ;
+testapp.c:    request->message.header.request.opcode = cmd;
+testapp.c:    request->message.header.request.keylen = htons(keylen);
+testapp.c:    request->message.header.request.extlen = 8;
+testapp.c:    request->message.header.request.bodylen = htonl(keylen + 8 + dtalen);
+testapp.c:    request->message.header.request.opaque = 0xdeadbeef;
+testapp.c:    request->message.body.flags = flags;
+testapp.c:    request->message.body.expiration = exp;
+testapp.c:    request->message.header.request.magic = PROTOCOL_BINARY_REQ;
+testapp.c:    request->message.header.request.opcode = cmd;
+testapp.c:    request->message.header.request.extlen = extlen;
+testapp.c:    request->message.header.request.keylen = htons(keylen);
+testapp.c:    request->message.header.request.bodylen = htonl(extlen + keylen + dtalen);
+testapp.c:    request->message.header.request.opaque = 0xdeadbeef;
+testapp.c:    request->message.header.request.magic = PROTOCOL_BINARY_REQ;
+testapp.c:    request->message.header.request.opcode = cmd;
+testapp.c:        request->message.header.request.extlen = 4;
+testapp.c:        request->message.body.expiration = htonl(exptime);
+testapp.c:        request->message.header.request.bodylen = htonl(4);
+testapp.c:    request->message.header.request.opaque = 0xdeadbeef;
+testapp.c:    request->message.header.request.magic = PROTOCOL_BINARY_REQ;
+testapp.c:    request->message.header.request.opcode = cmd;
+testapp.c:    request->message.header.request.keylen = htons(keylen);
+testapp.c:    request->message.header.request.extlen = 4;
+testapp.c:    request->message.body.expiration = htonl(exptime);
+testapp.c:    request->message.header.request.bodylen = htonl(keylen + 4);
+testapp.c:    request->message.header.request.opaque = 0xdeadbeef;
+testapp.c:    request->message.header.request.magic = PROTOCOL_BINARY_REQ;
+testapp.c:    request->message.header.request.opcode = cmd;
+testapp.c:    request->message.header.request.keylen = htons(keylen);
+testapp.c:    request->message.header.request.extlen = 20;
+testapp.c:    request->message.header.request.bodylen = htonl(keylen + 20);
+testapp.c:    request->message.header.request.opaque = 0xdeadbeef;
+testapp.c:    request->message.body.delta = htonll(delta);
+testapp.c:    request->message.body.initial = htonll(initial);
+testapp.c:    request->message.body.expiration = htonl(exp);
+testapp.c:    assert(response->message.header.response.magic == PROTOCOL_BINARY_RES);
+testapp.c:    assert(response->message.header.response.opcode == cmd);
+testapp.c:    assert(response->message.header.response.datatype == PROTOCOL_BINARY_RAW_BYTES);
+testapp.c:    assert(response->message.header.response.status == status);
+testapp.c:    assert(response->message.header.response.opaque == 0xdeadbeef);
+testapp.c:            assert(response->message.header.response.keylen == 0);
+testapp.c:            assert(response->message.header.response.extlen == 0);
+testapp.c:            assert(response->message.header.response.bodylen == 0);
+testapp.c:            assert(response->message.header.response.cas != 0);
+testapp.c:            assert(response->message.header.response.keylen == 0);
+testapp.c:            assert(response->message.header.response.extlen == 0);
+testapp.c:            assert(response->message.header.response.bodylen == 0);
+testapp.c:            assert(response->message.header.response.cas == 0);
+testapp.c:            assert(response->message.header.response.keylen == 0);
+testapp.c:            assert(response->message.header.response.extlen == 0);
+testapp.c:            assert(response->message.header.response.bodylen == 8);
+testapp.c:            assert(response->message.header.response.cas != 0);
+testapp.c:            assert(response->message.header.response.extlen == 0);
+testapp.c:            assert(response->message.header.response.cas == 0);
+testapp.c:            assert(response->message.header.response.keylen == 0);
+testapp.c:            assert(response->message.header.response.extlen == 0);
+testapp.c:            assert(response->message.header.response.bodylen != 0);
+testapp.c:            assert(response->message.header.response.cas == 0);
+testapp.c:            assert(response->message.header.response.keylen == 0);
+testapp.c:            assert(response->message.header.response.extlen == 4);
+testapp.c:            assert(response->message.header.response.cas != 0);
+testapp.c:            assert(response->message.header.response.keylen != 0);
+testapp.c:            assert(response->message.header.response.extlen == 4);
+testapp.c:            assert(response->message.header.response.cas != 0);
+testapp.c:        assert(response->message.header.response.cas == 0);
+testapp.c:        assert(response->message.header.response.extlen == 0);
+testapp.c:            assert(response->message.header.response.keylen == 0);
+testapp.c:    /* run a little pipeline test ;-) */
+testapp.c:    for (ii = 9; ii >= 0; --ii) {
+testapp.c:                                     response->message.header.response.opcode,
+testapp.c:                                     response->message.header.response.status);
+testapp.c:            /* I don't want to pass on the quit commands ;-) */
+testapp.c:    /* send quitq to shut down the read thread ;-) */
+testapp.c:            if (err == -1) {
+testapp.c:    if (child == (pid_t)-1) {
+testapp.c:        while ((c = waitpid(child, &stat, 0)) == (pid_t)-1 && errno == EINTR);
+testapp.c:            fprintf(stdout, "ok # SKIP %d - %s\n", ii + 1, testcases[ii].description);
+testapp.c:            fprintf(stdout, "ok %d - %s\n", ii + 1, testcases[ii].description);
+testapp.c:            fprintf(stdout, "not ok %d - %s\n", ii + 1, testcases[ii].description);
+thread.c:/* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
+thread.c:#define hashmask(n) (hashsize(n)-1)
+thread.c:    pthread_mutex_init(&cq->lock, NULL);
+thread.c:    cq->head = NULL;
+thread.c:    cq->tail = NULL;
+thread.c:    pthread_mutex_lock(&cq->lock);
+thread.c:    item = cq->head;
+thread.c:        cq->head = item->next;
+thread.c:        if (NULL == cq->head)
+thread.c:            cq->tail = NULL;
+thread.c:    pthread_mutex_unlock(&cq->lock);
+thread.c:    item->next = NULL;
+thread.c:    pthread_mutex_lock(&cq->lock);
+thread.c:    if (NULL == cq->tail)
+thread.c:        cq->head = item;
+thread.c:        cq->tail->next = item;
+thread.c:    cq->tail = item;
+thread.c:    pthread_mutex_unlock(&cq->lock);
+thread.c:        cqi_freelist = item->next;
+thread.c:            item[i - 1].next = &item[i];
+thread.c:        item[ITEMS_PER_ALLOC - 1].next = cqi_freelist;
+thread.c:    item->next = cqi_freelist;
+thread.c:    if ((ret = pthread_create(&((LIBEVENT_THREAD*)arg)->thread_id, &attr, func, arg)) != 0) {
+thread.c:    me->base = event_base_new_with_config(ev_config);
+thread.c:    me->base = event_init();
+thread.c:    if (! me->base) {
+thread.c:    event_set(&me->notify_event, me->notify_receive_fd,
+thread.c:    event_base_set(me->base, &me->notify_event);
+thread.c:    if (event_add(&me->notify_event, 0) == -1) {
+thread.c:    me->new_conn_queue = malloc(sizeof(struct conn_queue));
+thread.c:    if (me->new_conn_queue == NULL) {
+thread.c:    cq_init(me->new_conn_queue);
+thread.c:    if (pthread_mutex_init(&me->stats.mutex, NULL) != 0) {
+thread.c:    me->suffix_cache = cache_create("suffix", SUFFIX_SIZE, sizeof(char*),
+thread.c:    if (me->suffix_cache == NULL) {
+thread.c:    me->io_cache = cache_create("io", sizeof(io_wrap), sizeof(char*), NULL, NULL);
+thread.c:    if (me->io_cache == NULL) {
+thread.c:    /* Any per-thread setup can happen here; memcached_thread_init() will block until
+thread.c:    me->l = logger_create();
+thread.c:    me->lru_bump_buf = item_lru_bump_buf_create();
+thread.c:    if (me->l == NULL || me->lru_bump_buf == NULL) {
+thread.c:    event_base_loop(me->base, 0);
+thread.c:    event_base_free(me->base);
+thread.c:        item = cq_pop(me->new_conn_queue);
+thread.c:        switch (item->mode) {
+thread.c:                c = conn_new(item->sfd, item->init_state, item->event_flags,
+thread.c:                                   item->read_buffer_size, item->transport,
+thread.c:                                   me->base);
+thread.c:                    if (IS_UDP(item->transport)) {
+thread.c:                                item->sfd);
+thread.c:                        close(item->sfd);
+thread.c:                    c->thread = me;
+thread.c:                conn_worker_readd(item->c);
+thread.c:static int last_thread = -1;
+thread.c:    item->sfd = sfd;
+thread.c:    item->init_state = init_state;
+thread.c:    item->event_flags = event_flags;
+thread.c:    item->read_buffer_size = read_buffer_size;
+thread.c:    item->transport = transport;
+thread.c:    item->mode = queue_new_conn;
+thread.c:    cq_push(thread->new_conn_queue, item);
+thread.c:    MEMCACHED_CONN_DISPATCH(sfd, thread->thread_id);
+thread.c:    if (write(thread->notify_send_fd, buf, 1) != 1) {
+thread.c: * Re-dispatches a connection back to the original thread. Can be called from
+thread.c:        c->state = conn_closed;
+thread.c:        close(c->sfd);
+thread.c:    LIBEVENT_THREAD *thread = c->thread;
+thread.c:    item->sfd = c->sfd;
+thread.c:    item->init_state = conn_new_cmd;
+thread.c:    item->c = c;
+thread.c:    item->mode = queue_redispatch;
+thread.c:    cq_push(thread->new_conn_queue, item);
+thread.c:    if (write(thread->notify_send_fd, buf, 1) != 1) {
+thread.c:    c->state = conn_closed;
+thread.c:        fprintf(stderr, "<%d connection closed from side thread.\n", c->sfd);
+thread.c:    close(c->sfd);
+thread.c:    stats_state.curr_conns--;
+thread.c: * lazy-expiring as needed.
+thread.c:    hv = hash(ITEM_key(item), item->nkey);
+thread.c:    hv = hash(ITEM_key(item), item->nkey);
+thread.c: * it to be thread-safe.
+thread.c:    hv = hash(ITEM_key(item), item->nkey);
+thread.c:    hv = hash(ITEM_key(item), item->nkey);
+thread.c:#define X(name) stats->name += threads[ii].stats.name;
+thread.c:#define X(name) stats->slab_stats[sid].name += \
+thread.c:            stats->lru_hits[sid] +=
+thread.c:            stats->slab_stats[CLEAR_LRU(sid)].get_hits +=
+thread.c:#define X(name) out->name += stats->slab_stats[sid].name;
+thread.c:        fprintf(stderr, "Item lock table grows with `-t N` (worker threadcount)\n");
+thread.c:        fprintf(stderr, "Hash table grows with `-o hashpower=N` \n");
+timedrun.c:    case -1:
+util.c:        if (isalnum(x) || x == '-' || x == '.' || x == '_' || x == '~') {
+util.c:            if (strchr(str, '-') != NULL) {
+util.c:            if (strchr(str, '-') != NULL) {
+util.c:    if (vsnprintf(buf, sizeof(buf), fmt, ap) == -1) {
+util.c:        buf[sizeof(buf) - 1] = '\0';
+util.c:    /* big-endian machines don't need byte swapping */
