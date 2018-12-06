@@ -2920,7 +2920,7 @@ typedef struct token_s {
 #define SUBCOMMAND_TOKEN 1
 #define KEY_TOKEN 1
 
-#define MAX_TOKENS 8
+#define MAX_TOKENS 38
 
 /*
  * Tokenize the command string by replacing whitespace with '\0' and update
@@ -3404,9 +3404,9 @@ static void process_slab_optimal(conn *c, token_t *tokens, const size_t ntokens)
                 Need to handle this better. We need to stop the execution slab_automove_on while processing this.
                 Possibly use signals?
         */
-	printf("Received new distribution from optimal server\n");
-        for(int i=0;i< ntokens-1;i++){
-		
+	printf("Received new distribution from optimal server %zd \n",ntokens);
+        for(int i=0;i< ntokens-2;i++){
+		printf("1\n");	
                 safe_strtoul(tokens[i+1].value, &slab_optimal[i]);
         }
 	 out_string(c, "OKAY");
