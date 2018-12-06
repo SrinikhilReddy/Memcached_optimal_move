@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.Socket;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 class Item{
     String key;
     String value;
@@ -148,6 +149,7 @@ class offline_tracer{
             PrintWriter out = new PrintWriter(telsoc.getOutputStream(),true);
             String str = Arrays.toString(distribution).replaceAll("\\s+", "");
             str = str.replaceAll(","," ");
+	    System.out.println("Optimal computed and being sent to:"+ server + "," + str);
             out.println("slab_optimal "+str.substring(1,str.length()-1));
         }catch(IOException io){
             System.out.println(io.getMessage());
@@ -162,28 +164,47 @@ class offline_tracer{
             
         */
         while(true){
-            File f = new File("~/Memcached_optimal_move/optimal/traces");
-            if(f.list().length > 0){
+	    String folder = "/home/ubuntu/Memcached_optimal_move/optimal/traces/";
+            File f = new File(folder);
+            if (f == null) {
+		System.out.println("No such folder path");
+		return;
+	    } 
+	    if(f!=null && f.list()!=null && f.list().length > 0){
+//		System.out.println("Here\n");
             ArrayList<String> names = new ArrayList<String>(Arrays.asList(f.list()));
             for(String s:names){
-                HashMap map = getSortedKeyDistribution("~/Memcached_optimal_move/optimal/traces"+s);
+		try{
+		TimeUnit.SECONDS.sleep(3);
+		}
+		catch(InterruptedException io){
+			System.out.println(io.getMessage());
+		}
+//		System.out.println("Starting the purge");
+                HashMap map = getSortedKeyDistribution(folder+s);
                 List<Page> final_list = divideintopages(sortByValues((HashMap)map));
                 
                 int[] count = new int[35];
                 int i = 0;
                 for(Page p:final_list){
-                    if(i>=80) break;
+                    if(i>=25) break;
                     i++;
                     //count.put(p.slab_no, count.getOrDefault(p.slab_no, 0)+1);
                     count[p.slab_no]++;
                 }
-                
-//                File key_trace = new File("/Users/srinikhilreddy/Downloads/keytraces/"+s);
-//                if(!key_trace.delete()){
- //                   System.out.println("Delete file failed");
-   //             }
-                String server = s.substring(0,s.indexOf("."));
-                sendOverTelnet(server,count);
+                if(i == 25){
+                	File key_trace = new File(folder+s);
+                	if(!key_trace.delete()){
+                	    System.out.println("Delete file failed");
+                	}
+                	String server = s.substring(0,s.indexOf("."));
+             //  	if(i == 30){
+		  	sendOverTelnet(server,count);
+		}
+		 else{
+			System.out.println("This distribution was not sent" + Arrays.toString(count));
+		}
+		
             }
             }
         }
